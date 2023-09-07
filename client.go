@@ -25,9 +25,9 @@ func NewClient() (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
+func (c *Client) GetCharacterProfile(cq *CharacterQuery) (*CharacterProfile, error) {
 	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.region + "&realm=" + cq.realm + "&name=" + cq.name
-	if cq.fields != nil && len(cq.fields) == 0 {
+	if cq.fields != nil && len(cq.fields) != 0 {
 		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
 	}
 
@@ -46,7 +46,7 @@ func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
 		return nil, errors.New("api response error")
 	}
 
-	var profile Character
+	var profile CharacterProfile
 	err = json.Unmarshal(body, &profile)
 	if err != nil {
 		return nil, errors.New("character profile mapping error")

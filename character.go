@@ -9,7 +9,7 @@ type CharacterQuery struct {
 	fields []string
 }
 
-type Character struct {
+type CharacterProfile struct {
 	Name              string `json:"name"`
 	Race              string `json:"race"`
 	Class             string `json:"class"`
@@ -30,7 +30,10 @@ type Character struct {
 type Gear struct {
 	ItemLevelEquipped int `json:"item_level_equipped"`
 	ItemLevelTotal    int `json:"item_level_total"`
-	// Artifact Traits
+	// Items             []Item `json:"items"`
+}
+
+type Item struct {
 }
 
 func NewCharacterQuery(

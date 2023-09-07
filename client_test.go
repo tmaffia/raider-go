@@ -15,11 +15,11 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func TestGetCharacter(t *testing.T) {
+func TestGetCharacterProfile(t *testing.T) {
 	c, _ := NewClient()
 	cq, _ := NewCharacterQuery("us", "illidan", "highervalue", nil)
 
-	profile, err := c.GetCharacter(cq)
+	profile, err := c.GetCharacterProfile(cq)
 
 	if err != nil {
 		t.Errorf("Error getting character")
@@ -28,5 +28,15 @@ func TestGetCharacter(t *testing.T) {
 }
 
 func TestGetCharacterWithGear(t *testing.T) {
+	c, _ := NewClient()
 
+	fields := []string{"gear"}
+	cq, _ := NewCharacterQuery("us", "illidan", "highervalue", &fields)
+
+	profile, err := c.GetCharacterProfile(cq)
+
+	if err != nil {
+		t.Errorf("Error getting character")
+	}
+	t.Logf("%+v", profile)
 }
