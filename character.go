@@ -33,11 +33,11 @@ type Gear struct {
 	// Artifact Traits
 }
 
-func newCharacterQuery(
+func NewCharacterQuery(
 	region string,
 	realm string,
 	name string,
-	fields []string) (*CharacterQuery, error) {
+	fields *[]string) (*CharacterQuery, error) {
 
 	if region == "" {
 		return nil, errors.New("region error")
@@ -55,7 +55,10 @@ func newCharacterQuery(
 		region: region,
 		realm:  realm,
 		name:   name,
-		fields: fields,
+	}
+
+	if fields != nil {
+		cq.fields = *fields
 	}
 
 	return &cq, nil

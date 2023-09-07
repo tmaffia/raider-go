@@ -11,12 +11,12 @@ func TestNewCharacterQuery(t *testing.T) {
 	name := "thehighvalue"
 	fields := []string{"gear", "mythic_plus_rank", "mythic_plus_recent_runs"}
 
-	cq, err := newCharacterQuery(region, realm, name, fields)
+	cq, err := NewCharacterQuery(region, realm, name, &fields)
 
 	if err != nil {
 		log.Fatal(err.Error())
 		panic(err.Error())
 	}
 
-	log.Println(cq)
+	t.Logf("%+v", cq)
 }

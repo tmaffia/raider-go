@@ -27,7 +27,7 @@ func NewClient() (*Client, error) {
 
 func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
 	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.region + "&realm=" + cq.realm + "&name=" + cq.name
-	if len(cq.fields) == 0 {
+	if cq.fields != nil && len(cq.fields) == 0 {
 		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
 	}
 
