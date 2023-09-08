@@ -8,9 +8,6 @@ import (
 	"strings"
 )
 
-type Config struct {
-}
-
 const baseUrl string = "https://raider.io/api"
 
 type Client struct {
