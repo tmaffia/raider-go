@@ -23,9 +23,9 @@ func NewClient() (*Client, error) {
 }
 
 func (c *Client) GetCharacterProfile(cq *CharacterQuery) (*CharacterProfile, error) {
-	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.region + "&realm=" + cq.realm + "&name=" + cq.name
-	if cq.fields != nil && len(cq.fields) != 0 {
-		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
+	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.Region + "&realm=" + cq.Realm + "&name=" + cq.Name
+	if cq.Fields != nil && len(cq.Fields) != 0 {
+		reqUrl += "&fields=" + strings.Join(cq.Fields, ",")
 	}
 
 	resp, err := c.httpClient.Get(reqUrl)

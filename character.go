@@ -3,10 +3,10 @@ package raiderio
 import "errors"
 
 type CharacterQuery struct {
-	region string
-	realm  string
-	name   string
-	fields []string
+	Region string   `json:"region"`
+	Realm  string   `json:"realm"`
+	Name   string   `json:"name"`
+	Fields []string `json:"fields"`
 }
 
 type CharacterProfile struct {
@@ -55,13 +55,13 @@ func NewCharacterQuery(
 	}
 
 	cq := CharacterQuery{
-		region: region,
-		realm:  realm,
-		name:   name,
+		Region: region,
+		Realm:  realm,
+		Name:   name,
 	}
 
 	if fields != nil {
-		cq.fields = *fields
+		cq.Fields = *fields
 	}
 
 	return &cq, nil
