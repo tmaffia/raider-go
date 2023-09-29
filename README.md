@@ -10,6 +10,7 @@ query, err := raiderio.NewCharacterQuery(
     "us",
     "illidan",
     "Highervalue",
+    nil,
 )
 
 profile, err := client.GetCharacterProfile(query)
