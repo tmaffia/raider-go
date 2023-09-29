@@ -1,3 +1,3 @@
-module github.com/tmaffia/raider-go
+module github.com/tmaffia/raiderio
 
 go 1.20
