@@ -5,18 +5,15 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient()
+	c := NewClient()
 
-	if err != nil {
-		t.Errorf("NewClient creation fail")
-	}
 	if c.apiUrl != "https://raider.io/api/v1" {
 		t.Errorf("NewClient apiUrl created incorrectly")
 	}
 }
 
 func TestGetCharacterProfile(t *testing.T) {
-	c, _ := NewClient()
+	c := NewClient()
 	cq, _ := NewCharacterQuery("us", "illidan", "highervalue", nil)
 
 	profile, err := c.GetCharacterProfile(cq)
@@ -28,7 +25,7 @@ func TestGetCharacterProfile(t *testing.T) {
 }
 
 func TestGetCharacterWGear(t *testing.T) {
-	c, _ := NewClient()
+	c := NewClient()
 
 	fields := []string{"gear"}
 	cq, _ := NewCharacterQuery("us", "illidan", "highervalue", &fields)
@@ -42,7 +39,7 @@ func TestGetCharacterWGear(t *testing.T) {
 }
 
 func TestGetCharacterWTalents(t *testing.T) {
-	c, _ := NewClient()
+	c := NewClient()
 
 	fields := []string{"talents"}
 	cq, _ := NewCharacterQuery("us", "illidan",

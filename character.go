@@ -2,6 +2,8 @@ package raiderio
 
 import "errors"
 
+// CharacterQuery is a struct that represents the query parameters
+// sent for a character profile request
 type CharacterQuery struct {
 	Region string   `json:"region"`
 	Realm  string   `json:"realm"`
@@ -9,6 +11,8 @@ type CharacterQuery struct {
 	Fields []string `json:"fields"`
 }
 
+// CharacterProfile is a struct that represents the response from
+// a character profile request
 type CharacterProfile struct {
 	Name              string        `json:"name"`
 	Race              string        `json:"race"`
@@ -29,6 +33,8 @@ type CharacterProfile struct {
 	Gear              Gear          `json:"gear"`
 }
 
+// Gear is a struct that represents the gear of a character
+// in a character profile response
 type Gear struct {
 	UpdatedAt         string `json:"updated_at"`
 	ItemLevelEquipped int    `json:"item_level_equipped"`
@@ -36,6 +42,8 @@ type Gear struct {
 	Items             Items  `json:"items"`
 }
 
+// Items is a struct that represents the items of a character
+// in a character profile response
 type Items struct {
 	Head     Item `json:"head"`
 	Neck     Item `json:"neck"`
@@ -57,6 +65,7 @@ type Items struct {
 	Tabard   Item `json:"tabard"`
 }
 
+// Item is a struct that represents a single item
 type Item struct {
 	ID          int    `json:"item_id"`
 	ItemLevel   int    `json:"item_level"`
@@ -68,11 +77,14 @@ type Item struct {
 	Bonuses     []int  `json:"bonuses"`
 }
 
+// TalentLoadout is a struct of a talent loadout
+// It includes the spec id and talent loadout string
 type TalentLoadout struct {
 	LoadoutSpecID int    `json:"loadout_spec_id"`
 	LoadoutText   string `json:"loadout_text"`
 }
 
+// NewCharacterQuery creates a new CharacterQuery struct
 func NewCharacterQuery(
 	region string,
 	realm string,

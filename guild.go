@@ -2,6 +2,8 @@ package raiderio
 
 import "errors"
 
+// GuildQuery is a struct that represents the query parameters
+// sent for a guild profile request
 type GuildQuery struct {
 	region string
 	realm  string
@@ -9,6 +11,8 @@ type GuildQuery struct {
 	fields []string
 }
 
+// GuildProfile is a struct that represents the response from
+// a guild profile request
 type GuildProfile struct {
 	Name       string `json:"name"`
 	Faction    string `json:"faction"`
@@ -17,6 +21,9 @@ type GuildProfile struct {
 	ProfileUrl string `json:"profile_url"`
 }
 
+// NewGuildQuery creates a new GuildQuery struct
+// It returns an error if any of the required parameters are empty
+// or if the fields parameter is not nil and is empty
 func NewGuildQuery(
 	region string,
 	realm string,
