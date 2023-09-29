@@ -27,11 +27,26 @@ func TestGetCharacterProfile(t *testing.T) {
 	t.Logf("%+v", profile)
 }
 
-func TestGetCharacterWithGear(t *testing.T) {
+func TestGetCharacterWGear(t *testing.T) {
 	c, _ := NewClient()
 
 	fields := []string{"gear"}
 	cq, _ := NewCharacterQuery("us", "illidan", "highervalue", &fields)
+
+	profile, err := c.GetCharacterProfile(cq)
+
+	if err != nil {
+		t.Errorf("Error getting character")
+	}
+	t.Logf("%+v", profile)
+}
+
+func TestGetCharacterWTalents(t *testing.T) {
+	c, _ := NewClient()
+
+	fields := []string{"talents"}
+	cq, _ := NewCharacterQuery("us", "illidan",
+		"gigavalue", &fields)
 
 	profile, err := c.GetCharacterProfile(cq)
 
