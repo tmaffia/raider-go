@@ -1,4 +1,4 @@
-# Raider-Go
+# Raider.io API Go wrapper
 
 Raider go is a wrapper for the raider.io API written in Go 
 
