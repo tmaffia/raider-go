@@ -10,12 +10,12 @@ Raider go is a wrapper for the raider.io API written in Go
 
 ```go
 client, err := raiderio.NewClient()
-query, err := raiderio.NewCharacterQuery(
-    "us",
-    "illidan",
-    "Highervalue",
-    nil,
-)
+cq := CharacterQuery{
+	Region:        "us",
+	Realm:         "illidan",
+	Name:          "highervalue",
+	TalentLoadout: true,
+}
 
-profile, err := client.GetCharacterProfile(query)
+profile, err := client.GetCharacter(&cq)
 ```
