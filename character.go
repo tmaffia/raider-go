@@ -5,15 +5,17 @@ import "errors"
 // CharacterQuery is a struct that represents the query parameters
 // sent for a character profile request
 type CharacterQuery struct {
-	Region string   `json:"region"`
-	Realm  string   `json:"realm"`
-	Name   string   `json:"name"`
-	Fields []string `json:"fields"`
+	Region        string
+	Realm         string
+	Name          string
+	TalentLoadout bool
+	Gear          bool
+	fields        []string
 }
 
-// CharacterProfile is a struct that represents the response from
+// Character is a struct that represents the response from
 // a character profile request
-type CharacterProfile struct {
+type Character struct {
 	Name              string        `json:"name"`
 	Race              string        `json:"race"`
 	Class             string        `json:"class"`
@@ -84,34 +86,29 @@ type TalentLoadout struct {
 	LoadoutText   string `json:"loadout_text"`
 }
 
-// NewCharacterQuery creates a new CharacterQuery struct
-func NewCharacterQuery(
-	region string,
-	realm string,
-	name string,
-	fields *[]string) (*CharacterQuery, error) {
-
-	if region == "" {
-		return nil, errors.New("region error")
+// createCharacterQuery creates and validates a CharacterQuery struct
+// It returns an error if any of the required parameters are empty
+// or if the fields are invalid
+func createCharacterQuery(cq *CharacterQuery) error {
+	if cq.Region == "" {
+		return errors.New("region error")
 	}
 
-	if realm == "" {
-		return nil, errors.New("realm error")
+	if cq.Realm == "" {
+		return errors.New("realm error")
 	}
 
-	if name == "" {
-		return nil, errors.New("name error")
+	if cq.Name == "" {
+		return errors.New("name error")
 	}
 
-	cq := CharacterQuery{
-		Region: region,
-		Realm:  realm,
-		Name:   name,
+	if cq.TalentLoadout {
+		cq.fields = append(cq.fields, "talent_loadout")
 	}
 
-	if fields != nil {
-		cq.Fields = *fields
+	if cq.Gear {
+		cq.fields = append(cq.fields, "gear")
 	}
 
-	return &cq, nil
+	return nil
 }

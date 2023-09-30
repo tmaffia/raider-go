@@ -1,22 +1,55 @@
 package raiderio
 
 import (
-	"log"
 	"testing"
 )
 
 func TestNewCharacterQuery(t *testing.T) {
-	region := "us"
-	realm := "illidan"
-	name := "thehighvalue"
-	fields := []string{"gear", "mythic_plus_rank", "mythic_plus_recent_runs"}
-
-	cq, err := NewCharacterQuery(region, realm, name, &fields)
-
-	if err != nil {
-		log.Fatal(err.Error())
-		panic(err.Error())
+	cq := CharacterQuery{
+		Region: "us",
+		Realm:  "illidan",
+		Name:   "liquid",
 	}
 
+	err := createCharacterQuery(&cq)
+	if err != nil {
+		t.Errorf("Error creating guild query")
+	}
+	t.Logf("%+v", cq)
+}
+
+func TestNewCharacterQueryWGear(t *testing.T) {
+	cq := CharacterQuery{
+		Region: "us",
+		Realm:  "illidan",
+		Name:   "liquid",
+		Gear:   true,
+	}
+
+	err := createCharacterQuery(&cq)
+	if err != nil {
+		t.Errorf("Error creating guild query")
+	}
+	if cq.fields[0] != "gear" {
+		t.Errorf("Error creating guild query")
+	}
+	t.Logf("%+v", cq)
+}
+
+func TestNewCharacterQueryWTalents(t *testing.T) {
+	cq := CharacterQuery{
+		Region:        "us",
+		Realm:         "illidan",
+		Name:          "liquid",
+		TalentLoadout: true,
+	}
+
+	err := createCharacterQuery(&cq)
+	if err != nil {
+		t.Errorf("Error creating guild query")
+	}
+	if cq.fields[0] != "talent_loadout" {
+		t.Errorf("Error creating guild query")
+	}
 	t.Logf("%+v", cq)
 }

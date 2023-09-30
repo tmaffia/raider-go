@@ -25,15 +25,64 @@ func NewClient() *Client {
 	return &c
 }
 
-// GetCharacterProfile retrieves a character profile from the Raider.IO API
+// GetCharacter retrieves a character profile from the Raider.IO API
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the CharacterProfile struct
-func (c *Client) GetCharacterProfile(cq *CharacterQuery) (*CharacterProfile, error) {
-	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.Region + "&realm=" + cq.Realm + "&name=" + cq.Name
-	if cq.Fields != nil && len(cq.Fields) != 0 {
-		reqUrl += "&fields=" + strings.Join(cq.Fields, ",")
+func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
+	err := createCharacterQuery(cq)
+	if err != nil {
+		return nil, err
 	}
 
+	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.Region + "&realm=" + cq.Realm + "&name=" + cq.Name
+	if cq.fields != nil && len(cq.fields) != 0 {
+		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
+	}
+
+	body, err := c.getAPIResponse(reqUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	var profile Character
+	err = json.Unmarshal(body, &profile)
+	if err != nil {
+		return nil, errors.New("character profile mapping error")
+	}
+
+	return &profile, nil
+}
+
+// GetGuild retrieves a guild profile from the Raider.IO API
+// It returns an error if the API returns a non-200 status code, or if the
+// response body cannot be read or mapped to the GuildProfile struct
+func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
+	err := createGuildQuery(gq)
+	if err != nil {
+		return nil, err
+	}
+
+	reqUrl := c.apiUrl + "/guilds/profile?region=" + gq.Region + "&realm=" + gq.Realm + "&name=" + gq.Name
+	if gq.fields != nil && len(gq.fields) != 0 {
+		reqUrl += "&fields=" + strings.Join(gq.fields, ",")
+	}
+
+	body, err := c.getAPIResponse(reqUrl)
+	if err != nil {
+		return nil, err
+	}
+	var profile Guild
+	err = json.Unmarshal(body, &profile)
+	if err != nil {
+		return nil, errors.New("guild profile mapping error")
+	}
+	return &profile, nil
+}
+
+// getAPIResponse is a helper function that makes a GET request to the Raider.IO API
+// It returns an error if the API returns a non-200 status code, or if the
+// response body cannot be read
+func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 	resp, err := c.httpClient.Get(reqUrl)
 
 	if resp.StatusCode != 200 {
@@ -48,12 +97,5 @@ func (c *Client) GetCharacterProfile(cq *CharacterQuery) (*CharacterProfile, err
 	if err != nil {
 		return nil, errors.New("api response error")
 	}
-
-	var profile CharacterProfile
-	err = json.Unmarshal(body, &profile)
-	if err != nil {
-		return nil, errors.New("character profile mapping error")
-	}
-
-	return &profile, nil
+	return body, nil
 }
