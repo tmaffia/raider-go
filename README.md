@@ -10,7 +10,7 @@ Raider go is a wrapper for the raider.io API written in Go
 
 ```go
 client, err := raiderio.NewClient()
-cq := CharacterQuery{
+cq := raiderio.CharacterQuery{
 	Region:        "us",
 	Realm:         "illidan",
 	Name:          "highervalue",
