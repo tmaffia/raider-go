@@ -4,7 +4,7 @@
 ![Go Build & Test](https://github.com/tmaffia/raiderio/actions/workflows/go.yml/badge.svg)
 
 
-Raider go is a wrapper for the raider.io API written in Go 
+Wrapper for the raider.io API written in Go 
 
 ## Usage
 
