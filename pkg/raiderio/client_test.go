@@ -143,7 +143,7 @@ func TestGetRaidRankings(t *testing.T) {
 	c := NewClient()
 	rq := RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
-		Difficulty: Mythic,
+		Difficulty: MythicDifficulty,
 		Region:     "world",
 	}
 

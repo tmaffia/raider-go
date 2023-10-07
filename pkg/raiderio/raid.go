@@ -129,14 +129,14 @@ type Encounter struct {
 	Name string `json:"name"`
 }
 
-// Difficulty is a string type that represents the difficulty of a raid
+// RaidDifficulty is a string type that represents the difficulty of a raid
 // in a raid request
 type RaidDifficulty string
 
 const (
-	Normal RaidDifficulty = "normal"
-	Heroic RaidDifficulty = "heroic"
-	Mythic RaidDifficulty = "mythic"
+	NormalDifficulty RaidDifficulty = "normal"
+	HeroicDifficulty RaidDifficulty = "heroic"
+	MythicDifficulty RaidDifficulty = "mythic"
 )
 
 // validateRaidQuery validates a RaidQuery struct
