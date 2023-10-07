@@ -3,9 +3,12 @@ package raiderio
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/util"
 )
 
 // Base URL for the Raider.IO API
@@ -29,7 +32,7 @@ func NewClient() *Client {
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the CharacterProfile struct
 func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
-	err := createCharacterQuery(cq)
+	err := validateCharacterQuery(cq)
 	if err != nil {
 		return nil, err
 	}
@@ -98,4 +101,63 @@ func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 		return nil, errors.New("api response error")
 	}
 	return body, nil
+}
+
+// GetRaids retrieves a list of raids from the Raider.IO API
+// It returns an error if the API returns a non-200 status code, or if the
+// response body cannot be read or mapped to the Raids struct
+// Takes an Expansion enum as a parameter
+func (c *Client) GetRaids(e util.Expansion) (*Raids, error) {
+	reqUrl := c.apiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
+	body, err := c.getAPIResponse(reqUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	var raids Raids
+	err = json.Unmarshal(body, &raids)
+	if err != nil {
+		return nil, errors.New("raids mapping error")
+	}
+
+	return &raids, nil
+}
+
+// GetRaidRankings retrieves a list of raid rankings from the Raider.IO API
+// It returns an error if the API returns a non-200 status code, or if the
+// response body cannot be read or mapped to the RaidRankings struct
+// Takes a RaidQuery struct as a parameter
+func (c *Client) GetRaidRankings(rq *RaidQuery) (*RaidRankings, error) {
+	err := validateRaidRankingsQuery(rq)
+	if err != nil {
+		return nil, err
+	}
+
+	reqUrl := c.apiUrl + "/raiding/raid-rankings?raid=" + rq.Name +
+		"&difficulty=" + string(rq.Difficulty) + "&region=" + rq.Region
+
+	if rq.Realm != "" {
+		reqUrl += "&realm=" + rq.Realm
+	}
+
+	if rq.Limit != 0 {
+		reqUrl += "&limit=" + fmt.Sprintf("%d", rq.Limit)
+	}
+
+	if rq.Page != 0 {
+		reqUrl += "&page=" + fmt.Sprintf("%d", rq.Page)
+	}
+
+	body, err := c.getAPIResponse(reqUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	var rankings RaidRankings
+	err = json.Unmarshal(body, &rankings)
+	if err != nil {
+		return nil, errors.New("raid rankings mapping error: " + err.Error())
+	}
+
+	return &rankings, nil
 }

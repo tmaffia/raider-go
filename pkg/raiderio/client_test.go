@@ -2,6 +2,8 @@ package raiderio
 
 import (
 	"testing"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/util"
 )
 
 func TestNewClient(t *testing.T) {
@@ -125,4 +127,29 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 		t.Errorf("Error getting guild")
 	}
 	t.Logf("%+v", profile)
+}
+
+func TestGetRaids(t *testing.T) {
+	c := NewClient()
+
+	raids, err := c.GetRaids(util.Dragonflight)
+	if err != nil {
+		t.Errorf("Error getting raids")
+	}
+	t.Logf("%+v", raids)
+}
+
+func TestGetRaidRankings(t *testing.T) {
+	c := NewClient()
+	rq := RaidQuery{
+		Name:       "aberrus-the-shadowed-crucible",
+		Difficulty: Mythic,
+		Region:     "world",
+	}
+
+	rr, err := c.GetRaidRankings(&rq)
+	if err != nil {
+		t.Errorf("Error getting raid rankings: " + err.Error())
+	}
+	t.Logf("%+v", rr)
 }

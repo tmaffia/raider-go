@@ -86,10 +86,10 @@ type TalentLoadout struct {
 	LoadoutText   string `json:"loadout_text"`
 }
 
-// createCharacterQuery creates and validates a CharacterQuery struct
+// validateCharacterQuery creates and validates a CharacterQuery struct
 // It returns an error if any of the required parameters are empty
 // or if the fields are invalid
-func createCharacterQuery(cq *CharacterQuery) error {
+func validateCharacterQuery(cq *CharacterQuery) error {
 	if cq.Region == "" {
 		return errors.New("region error")
 	}
