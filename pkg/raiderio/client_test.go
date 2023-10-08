@@ -2,6 +2,9 @@ package raiderio
 
 import (
 	"testing"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/expansion"
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
 
 func TestNewClient(t *testing.T) {
@@ -15,7 +18,7 @@ func TestNewClient(t *testing.T) {
 func TestGetCharacterProfile(t *testing.T) {
 	c := NewClient()
 	cq := CharacterQuery{
-		Region: "us",
+		Region: region.US,
 		Realm:  "illidan",
 		Name:   "highervalue",
 	}
@@ -31,7 +34,7 @@ func TestGetCharacterProfile(t *testing.T) {
 func TestGetCharacterWGear(t *testing.T) {
 	c := NewClient()
 	cq := CharacterQuery{
-		Region: "us",
+		Region: region.US,
 		Realm:  "illidan",
 		Name:   "highervalue",
 		Gear:   true,
@@ -48,7 +51,7 @@ func TestGetCharacterWGear(t *testing.T) {
 func TestGetCharacterWTalents(t *testing.T) {
 	c := NewClient()
 	cq := CharacterQuery{
-		Region:        "us",
+		Region:        region.US,
 		Realm:         "illidan",
 		Name:          "highervalue",
 		TalentLoadout: true,
@@ -66,9 +69,9 @@ func TestGetGuild(t *testing.T) {
 	c := NewClient()
 
 	gq := GuildQuery{
-		Region: "us",
+		Region: region.US,
 		Realm:  "illidan",
-		Name:   "liquid",
+		Name:   "warpath",
 	}
 
 	profile, err := c.GetGuild(&gq)
@@ -82,9 +85,9 @@ func TestGetGuildWMembers(t *testing.T) {
 	c := NewClient()
 
 	gq := GuildQuery{
-		Region:  "us",
+		Region:  region.US,
 		Realm:   "illidan",
-		Name:    "liquid",
+		Name:    "warpath",
 		Members: true,
 	}
 
@@ -98,9 +101,9 @@ func TestGetGuildWMembers(t *testing.T) {
 func TestGetGuildWRaidProgression(t *testing.T) {
 	c := NewClient()
 	gq := GuildQuery{
-		Region:          "us",
+		Region:          region.US,
 		Realm:           "illidan",
-		Name:            "liquid",
+		Name:            "warpath",
 		RaidProgression: true,
 	}
 
@@ -114,9 +117,9 @@ func TestGetGuildWRaidProgression(t *testing.T) {
 func TestGetGuildWRaidRankings(t *testing.T) {
 	c := NewClient()
 	gq := GuildQuery{
-		Region:       "us",
+		Region:       region.US,
 		Realm:        "illidan",
-		Name:         "liquid",
+		Name:         "warpath",
 		RaidRankings: true,
 	}
 
@@ -125,4 +128,61 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 		t.Errorf("Error getting guild")
 	}
 	t.Logf("%+v", profile)
+}
+
+func TestGetRaids(t *testing.T) {
+	c := NewClient()
+
+	raids, err := c.GetRaids(expansion.Dragonflight)
+	if err != nil {
+		t.Errorf("Error getting raids")
+	}
+	t.Logf("%+v", raids)
+}
+
+func TestGetRaidRankings(t *testing.T) {
+	c := NewClient()
+	rq := RaidQuery{
+		Name:       "aberrus-the-shadowed-crucible",
+		Difficulty: MythicRaid,
+		Region:     region.WORLD,
+	}
+
+	rr, err := c.GetRaidRankings(&rq)
+	if err != nil {
+		t.Errorf("Error getting raid rankings: " + err.Error())
+	}
+	t.Logf("%+v", rr)
+}
+
+func TestGetRaidRankingsWRealm(t *testing.T) {
+	c := NewClient()
+	rq := RaidQuery{
+		Name:       "aberrus-the-shadowed-crucible",
+		Difficulty: MythicRaid,
+		Region:     region.US,
+		Realm:      "illidan",
+	}
+
+	rr, err := c.GetRaidRankings(&rq)
+	if err != nil {
+		t.Errorf("Error getting raid rankings: " + err.Error())
+	}
+	t.Logf("%+v", rr)
+}
+
+func TestGetRaidRankingsWLimit(t *testing.T) {
+	c := NewClient()
+	rq := RaidQuery{
+		Name:       "aberrus-the-shadowed-crucible",
+		Difficulty: MythicRaid,
+		Region:     region.US,
+		Limit:      2,
+	}
+
+	rr, err := c.GetRaidRankings(&rq)
+	if err != nil {
+		t.Errorf("Error getting raid rankings: " + err.Error())
+	}
+	t.Logf("%+v", rr)
 }

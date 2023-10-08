@@ -46,9 +46,9 @@ type GuildRaidProgression struct {
 }
 
 type GuildRaidRankings struct {
-	Amirdrassil          RaidRanking `json:"amirdrassil-amirdrassil-the-dreams-hope"`
-	Abberus              RaidRanking `json:"aberrus-the-shadowed-crucible"`
-	VaultOfTheIncarnates RaidRanking `json:"vault-of-the-incarnates"`
+	Amirdrassil          GuildRaidRanking `json:"amirdrassil-amirdrassil-the-dreams-hope"`
+	Abberus              GuildRaidRanking `json:"aberrus-the-shadowed-crucible"`
+	VaultOfTheIncarnates GuildRaidRanking `json:"vault-of-the-incarnates"`
 }
 
 // createGuildQuery creates and validates a GuildQuery struct

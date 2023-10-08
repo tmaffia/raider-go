@@ -11,7 +11,7 @@ func TestNewCharacterQuery(t *testing.T) {
 		Name:   "liquid",
 	}
 
-	err := createCharacterQuery(&cq)
+	err := validateCharacterQuery(&cq)
 	if err != nil {
 		t.Errorf("Error creating guild query")
 	}
@@ -26,7 +26,7 @@ func TestNewCharacterQueryWGear(t *testing.T) {
 		Gear:   true,
 	}
 
-	err := createCharacterQuery(&cq)
+	err := validateCharacterQuery(&cq)
 	if err != nil {
 		t.Errorf("Error creating guild query")
 	}
@@ -44,7 +44,7 @@ func TestNewCharacterQueryWTalents(t *testing.T) {
 		TalentLoadout: true,
 	}
 
-	err := createCharacterQuery(&cq)
+	err := validateCharacterQuery(&cq)
 	if err != nil {
 		t.Errorf("Error creating guild query")
 	}
