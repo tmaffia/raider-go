@@ -135,9 +135,9 @@ type Encounter struct {
 type RaidDifficulty string
 
 const (
-	NormalDifficulty RaidDifficulty = "normal"
-	HeroicDifficulty RaidDifficulty = "heroic"
-	MythicDifficulty RaidDifficulty = "mythic"
+	NormalRaid RaidDifficulty = "normal"
+	HeroicRaid RaidDifficulty = "heroic"
+	MythicRaid RaidDifficulty = "mythic"
 )
 
 // validateRaidQuery validates a RaidQuery struct

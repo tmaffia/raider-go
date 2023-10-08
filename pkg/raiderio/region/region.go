@@ -9,9 +9,10 @@ type Region struct {
 
 // Constants for regions available in Raider.IO API
 const (
-	US string = "us"
-	EU string = "eu"
-	KR string = "kr"
-	TW string = "tw"
-	CN string = "cn"
+	WORLD string = "world"
+	US    string = "us"
+	EU    string = "eu"
+	KR    string = "kr"
+	TW    string = "tw"
+	CN    string = "cn"
 )
