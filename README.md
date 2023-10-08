@@ -37,7 +37,7 @@ profile, err := client.GetGuild(&gq)
 ```go
 rq := raiderio.RaidQuery{
 	Name: 		"aberrus-the-shadowed-crucible",
-	Difficulty:	raiderio.MythicDifficulty,
+	Difficulty:	raiderio.MythicRaid,
 	Region: 	region.US,
 	Limit: 		10,
 }
