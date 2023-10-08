@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/tmaffia/raiderio/pkg/raiderio/util"
+	"github.com/tmaffia/raiderio/pkg/raiderio/expansion"
 )
 
 // Base URL for the Raider.IO API
@@ -107,7 +107,7 @@ func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the Raids struct
 // Takes an Expansion enum as a parameter
-func (c *Client) GetRaids(e util.Expansion) (*Raids, error) {
+func (c *Client) GetRaids(e expansion.Expansion) (*Raids, error) {
 	reqUrl := c.apiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
 	body, err := c.getAPIResponse(reqUrl)
 	if err != nil {

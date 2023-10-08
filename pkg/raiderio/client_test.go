@@ -3,7 +3,7 @@ package raiderio
 import (
 	"testing"
 
-	"github.com/tmaffia/raiderio/pkg/raiderio/util"
+	"github.com/tmaffia/raiderio/pkg/raiderio/expansion"
 )
 
 func TestNewClient(t *testing.T) {
@@ -132,7 +132,7 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 func TestGetRaids(t *testing.T) {
 	c := NewClient()
 
-	raids, err := c.GetRaids(util.Dragonflight)
+	raids, err := c.GetRaids(expansion.Dragonflight)
 	if err != nil {
 		t.Errorf("Error getting raids")
 	}

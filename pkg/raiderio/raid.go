@@ -3,7 +3,8 @@ package raiderio
 import (
 	"errors"
 
-	"github.com/tmaffia/raiderio/pkg/raiderio/util"
+	"github.com/tmaffia/raiderio/pkg/raiderio/realm"
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
 
 // RaidQuery is a struct that represents the query parameters
@@ -32,14 +33,14 @@ type RaidRanking struct {
 	Rank         int `json:"rank"`
 	RegionalRank int `json:"region_rank"`
 	Guild        struct {
-		Id      int         `json:"id"`
-		Name    string      `json:"name"`
-		Faction string      `json:"faction"`
-		Realm   util.Realm  `json:"realm"`
-		Region  util.Region `json:"region"`
-		Path    string      `json:"path"`
-		Logo    string      `json:"logo"`
-		Color   string      `json:"color"`
+		Id      int           `json:"id"`
+		Name    string        `json:"name"`
+		Faction string        `json:"faction"`
+		Realm   realm.Realm   `json:"realm"`
+		Region  region.Region `json:"region"`
+		Path    string        `json:"path"`
+		Logo    string        `json:"logo"`
+		Color   string        `json:"color"`
 	} `json:"guild"`
 	EncountersDefeated []struct {
 		Slug           string `json:"slug"`
