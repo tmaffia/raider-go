@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/tmaffia/raiderio.svg)](https://pkg.go.dev/github.com/tmaffia/raiderio)
 ![Go Build & Test](https://github.com/tmaffia/raiderio/actions/workflows/go.yml/badge.svg)
-
+[![Go Report Card](https://goreportcard.com/badge/github.com/tmaffia/raiderio)](https://goreportcard.com/report/github.com/tmaffia/raiderio)
 
 Wrapper for the raider.io API written in Go 
 
