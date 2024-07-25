@@ -11,14 +11,15 @@ Wrapper for the raider.io API written in Go
 ### Get a Character Profile
 ```go
 client, err := raiderio.NewClient()
-cq := raiderio.CharacterQuery{
-	Region:        region.US,
-	Realm:         "illidan",
-	Name:          "highervalue",
-	TalentLoadout: true,
-}
 
-profile, err := client.GetCharacter(&cq)
+profile, err := client.GetCharacter(&CharacterQuery{
+	Region: region.US,
+	Realm:  "illidan",
+	Name:   "thehighvalue",
+	TalentLoadout: true,
+})
+
+fmt.Println(profile.Class) // Mage
 ```
 
 ### Get a Guild Profile

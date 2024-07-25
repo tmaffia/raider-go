@@ -16,14 +16,11 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestGetCharacterProfile(t *testing.T) {
-	c := NewClient()
-	cq := CharacterQuery{
+	profile, err := NewClient().GetCharacter(&CharacterQuery{
 		Region: region.US,
 		Realm:  "illidan",
 		Name:   "highervalue",
-	}
-
-	profile, err := c.GetCharacter(&cq)
+	})
 
 	if err != nil {
 		t.Errorf("Error getting character")
@@ -32,15 +29,12 @@ func TestGetCharacterProfile(t *testing.T) {
 }
 
 func TestGetCharacterWGear(t *testing.T) {
-	c := NewClient()
-	cq := CharacterQuery{
+	profile, err := NewClient().GetCharacter(&CharacterQuery{
 		Region: region.US,
 		Realm:  "illidan",
 		Name:   "highervalue",
 		Gear:   true,
-	}
-
-	profile, err := c.GetCharacter(&cq)
+	})
 
 	if err != nil {
 		t.Errorf("Error getting character")
@@ -63,6 +57,7 @@ func TestGetCharacterWTalents(t *testing.T) {
 		t.Errorf("Error getting character")
 	}
 	t.Logf("%+v", profile)
+	t.Logf(profile.Class)
 }
 
 func TestGetGuild(t *testing.T) {
@@ -82,16 +77,13 @@ func TestGetGuild(t *testing.T) {
 }
 
 func TestGetGuildWMembers(t *testing.T) {
-	c := NewClient()
-
-	gq := GuildQuery{
+	profile, err := NewClient().GetGuild((&GuildQuery{
 		Region:  region.US,
 		Realm:   "illidan",
 		Name:    "warpath",
 		Members: true,
-	}
+	}))
 
-	profile, err := c.GetGuild(&gq)
 	if err != nil {
 		t.Errorf("Error getting guild")
 	}
@@ -99,15 +91,13 @@ func TestGetGuildWMembers(t *testing.T) {
 }
 
 func TestGetGuildWRaidProgression(t *testing.T) {
-	c := NewClient()
-	gq := GuildQuery{
+	profile, err := NewClient().GetGuild(&GuildQuery{
 		Region:          region.US,
 		Realm:           "illidan",
 		Name:            "warpath",
 		RaidProgression: true,
-	}
+	})
 
-	profile, err := c.GetGuild(&gq)
 	if err != nil {
 		t.Errorf("Error getting guild")
 	}
@@ -115,15 +105,13 @@ func TestGetGuildWRaidProgression(t *testing.T) {
 }
 
 func TestGetGuildWRaidRankings(t *testing.T) {
-	c := NewClient()
-	gq := GuildQuery{
+	profile, err := NewClient().GetGuild(&GuildQuery{
 		Region:       region.US,
 		Realm:        "illidan",
 		Name:         "warpath",
 		RaidRankings: true,
-	}
+	})
 
-	profile, err := c.GetGuild(&gq)
 	if err != nil {
 		t.Errorf("Error getting guild")
 	}
@@ -131,9 +119,7 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 }
 
 func TestGetRaids(t *testing.T) {
-	c := NewClient()
-
-	raids, err := c.GetRaids(expansion.Dragonflight)
+	raids, err := NewClient().GetRaids(expansion.Dragonflight)
 	if err != nil {
 		t.Errorf("Error getting raids")
 	}
@@ -141,14 +127,12 @@ func TestGetRaids(t *testing.T) {
 }
 
 func TestGetRaidRankings(t *testing.T) {
-	c := NewClient()
-	rq := RaidQuery{
+	rr, err := NewClient().GetRaidRankings(&RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
 		Difficulty: MythicRaid,
 		Region:     region.WORLD,
-	}
+	})
 
-	rr, err := c.GetRaidRankings(&rq)
 	if err != nil {
 		t.Errorf("Error getting raid rankings: " + err.Error())
 	}
@@ -156,15 +140,13 @@ func TestGetRaidRankings(t *testing.T) {
 }
 
 func TestGetRaidRankingsWRealm(t *testing.T) {
-	c := NewClient()
-	rq := RaidQuery{
+	rr, err := NewClient().GetRaidRankings(&RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
 		Difficulty: MythicRaid,
 		Region:     region.US,
 		Realm:      "illidan",
-	}
+	})
 
-	rr, err := c.GetRaidRankings(&rq)
 	if err != nil {
 		t.Errorf("Error getting raid rankings: " + err.Error())
 	}
@@ -172,15 +154,13 @@ func TestGetRaidRankingsWRealm(t *testing.T) {
 }
 
 func TestGetRaidRankingsWLimit(t *testing.T) {
-	c := NewClient()
-	rq := RaidQuery{
+	rr, err := NewClient().GetRaidRankings(&RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
 		Difficulty: MythicRaid,
 		Region:     region.US,
 		Limit:      2,
-	}
+	})
 
-	rr, err := c.GetRaidRankings(&rq)
 	if err != nil {
 		t.Errorf("Error getting raid rankings: " + err.Error())
 	}
