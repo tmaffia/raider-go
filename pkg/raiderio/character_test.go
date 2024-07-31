@@ -2,11 +2,13 @@ package raiderio
 
 import (
 	"testing"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
 
 func TestNewCharacterQuery(t *testing.T) {
 	cq := CharacterQuery{
-		Region: "us",
+		Region: region.US,
 		Realm:  "illidan",
 		Name:   "liquid",
 	}
@@ -20,7 +22,7 @@ func TestNewCharacterQuery(t *testing.T) {
 
 func TestNewCharacterQueryWGear(t *testing.T) {
 	cq := CharacterQuery{
-		Region: "us",
+		Region: region.US,
 		Realm:  "illidan",
 		Name:   "liquid",
 		Gear:   true,
@@ -38,7 +40,7 @@ func TestNewCharacterQueryWGear(t *testing.T) {
 
 func TestNewCharacterQueryWTalents(t *testing.T) {
 	cq := CharacterQuery{
-		Region:        "us",
+		Region:        region.US,
 		Realm:         "illidan",
 		Name:          "liquid",
 		TalentLoadout: true,

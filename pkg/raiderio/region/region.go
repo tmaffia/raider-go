@@ -7,12 +7,35 @@ type Region struct {
 	ShortName string `json:"short_name"`
 }
 
-// Constants for regions available in Raider.IO API
-const (
-	WORLD string = "world"
-	US    string = "us"
-	EU    string = "eu"
-	KR    string = "kr"
-	TW    string = "tw"
-	CN    string = "cn"
+var (
+	WORLD = &Region{
+		Name:      "World",
+		Slug:      "world",
+		ShortName: "world",
+	}
+	US = &Region{
+		Name:      "US",
+		Slug:      "us",
+		ShortName: "us",
+	}
+	EU = &Region{
+		Name:      "EU",
+		Slug:      "eu",
+		ShortName: "eu",
+	}
+	KR = &Region{
+		Name:      "KR",
+		Slug:      "kr",
+		ShortName: "kr",
+	}
+	TW = &Region{
+		Name:      "TW",
+		Slug:      "tw",
+		ShortName: "tw",
+	}
+	CN = &Region{
+		Name:      "CN",
+		Slug:      "cn",
+		ShortName: "cn",
+	}
 )

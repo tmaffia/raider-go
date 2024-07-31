@@ -1,12 +1,16 @@
 package raiderio
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+)
 
 // GuildQuery is a struct that represents the query parameters
 // sent for a guild profile request
 // Supports optional request fields: members, raid_progression, raid_rankings
 type GuildQuery struct {
-	Region          string
+	Region          *region.Region
 	Realm           string
 	Name            string
 	Members         bool
@@ -55,7 +59,7 @@ type GuildRaidRankings struct {
 // It returns an error if any of the required parameters are empty
 // or if the fields are invalid
 func createGuildQuery(gq *GuildQuery) error {
-	if gq.Region == "" {
+	if gq.Region == nil {
 		return errors.New("region error")
 	}
 

@@ -1,11 +1,15 @@
 package raiderio
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+)
 
 // CharacterQuery is a struct that represents the query parameters
 // sent for a character profile request
 type CharacterQuery struct {
-	Region        string
+	Region        *region.Region
 	Realm         string
 	Name          string
 	TalentLoadout bool
@@ -90,7 +94,7 @@ type TalentLoadout struct {
 // It returns an error if any of the required parameters are empty
 // or if the fields are invalid
 func validateCharacterQuery(cq *CharacterQuery) error {
-	if cq.Region == "" {
+	if cq.Region == nil {
 		return errors.New("region error")
 	}
 

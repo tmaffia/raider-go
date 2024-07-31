@@ -13,7 +13,7 @@ import (
 type RaidQuery struct {
 	Name       string
 	Difficulty RaidDifficulty
-	Region     string
+	Region     *region.Region
 	Realm      string
 	Limit      int
 	Page       int
@@ -151,7 +151,7 @@ func validateRaidRankingsQuery(rq *RaidQuery) error {
 		return errors.New("no raid difficulty provided")
 	}
 
-	if rq.Region == "" {
+	if rq.Region == nil {
 		return errors.New("no region provided")
 	}
 

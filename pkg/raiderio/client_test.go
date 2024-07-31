@@ -1,35 +1,56 @@
-package raiderio
+package raiderio_test
 
 import (
 	"testing"
 
+	"github.com/tmaffia/raiderio/pkg/raiderio"
 	"github.com/tmaffia/raiderio/pkg/raiderio/expansion"
 	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
 
 func TestNewClient(t *testing.T) {
-	c := NewClient()
+	c := raiderio.NewClient()
 
-	if c.apiUrl != "https://raider.io/api/v1" {
+	if c.ApiUrl != "https://raider.io/api/v1" {
 		t.Errorf("NewClient apiUrl created incorrectly")
 	}
 }
 
 func TestGetCharacterProfile(t *testing.T) {
-	profile, err := NewClient().GetCharacter(&CharacterQuery{
-		Region: region.US,
-		Realm:  "illidan",
-		Name:   "highervalue",
-	})
+	c := raiderio.NewClient()
 
-	if err != nil {
-		t.Errorf("Error getting character")
+	testCases := []struct {
+		region         *region.Region
+		realm          string
+		name           string
+		expectedErrMsg string
+		expectedName   string
+	}{
+		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
+		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, failed to find region badregion"},
+		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, could not find requested character"},
+		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "status code: 400, error: bad request, failed to find realm invalidrealm in region us"},
 	}
-	t.Logf("%+v", profile)
+
+	for _, tc := range testCases {
+		profile, err := c.GetCharacter(&raiderio.CharacterQuery{
+			Region: tc.region,
+			Realm:  tc.realm,
+			Name:   tc.name,
+		})
+
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("expected: %v, got: %v", tc.expectedErrMsg, err.Error())
+		}
+
+		if err == nil && profile.Name != tc.expectedName {
+			t.Fatalf("expected: %v, got: %v", tc.expectedName, profile.Name)
+		}
+	}
 }
 
 func TestGetCharacterWGear(t *testing.T) {
-	profile, err := NewClient().GetCharacter(&CharacterQuery{
+	profile, err := raiderio.NewClient().GetCharacter(&raiderio.CharacterQuery{
 		Region: region.US,
 		Realm:  "illidan",
 		Name:   "highervalue",
@@ -43,8 +64,8 @@ func TestGetCharacterWGear(t *testing.T) {
 }
 
 func TestGetCharacterWTalents(t *testing.T) {
-	c := NewClient()
-	cq := CharacterQuery{
+	c := raiderio.NewClient()
+	cq := raiderio.CharacterQuery{
 		Region:        region.US,
 		Realm:         "illidan",
 		Name:          "highervalue",
@@ -61,9 +82,9 @@ func TestGetCharacterWTalents(t *testing.T) {
 }
 
 func TestGetGuild(t *testing.T) {
-	c := NewClient()
+	c := raiderio.NewClient()
 
-	gq := GuildQuery{
+	gq := raiderio.GuildQuery{
 		Region: region.US,
 		Realm:  "illidan",
 		Name:   "warpath",
@@ -77,7 +98,9 @@ func TestGetGuild(t *testing.T) {
 }
 
 func TestGetGuildWMembers(t *testing.T) {
-	profile, err := NewClient().GetGuild((&GuildQuery{
+	c := raiderio.NewClient()
+
+	profile, err := c.GetGuild((&raiderio.GuildQuery{
 		Region:  region.US,
 		Realm:   "illidan",
 		Name:    "warpath",
@@ -91,7 +114,9 @@ func TestGetGuildWMembers(t *testing.T) {
 }
 
 func TestGetGuildWRaidProgression(t *testing.T) {
-	profile, err := NewClient().GetGuild(&GuildQuery{
+	c := raiderio.NewClient()
+
+	profile, err := c.GetGuild(&raiderio.GuildQuery{
 		Region:          region.US,
 		Realm:           "illidan",
 		Name:            "warpath",
@@ -105,7 +130,8 @@ func TestGetGuildWRaidProgression(t *testing.T) {
 }
 
 func TestGetGuildWRaidRankings(t *testing.T) {
-	profile, err := NewClient().GetGuild(&GuildQuery{
+	c := raiderio.NewClient()
+	profile, err := c.GetGuild(&raiderio.GuildQuery{
 		Region:       region.US,
 		Realm:        "illidan",
 		Name:         "warpath",
@@ -119,7 +145,8 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 }
 
 func TestGetRaids(t *testing.T) {
-	raids, err := NewClient().GetRaids(expansion.Dragonflight)
+	c := raiderio.NewClient()
+	raids, err := c.GetRaids(expansion.Dragonflight)
 	if err != nil {
 		t.Errorf("Error getting raids")
 	}
@@ -127,9 +154,11 @@ func TestGetRaids(t *testing.T) {
 }
 
 func TestGetRaidRankings(t *testing.T) {
-	rr, err := NewClient().GetRaidRankings(&RaidQuery{
+	c := raiderio.NewClient()
+
+	rr, err := c.GetRaidRankings(&raiderio.RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
-		Difficulty: MythicRaid,
+		Difficulty: raiderio.MythicRaid,
 		Region:     region.WORLD,
 	})
 
@@ -140,9 +169,11 @@ func TestGetRaidRankings(t *testing.T) {
 }
 
 func TestGetRaidRankingsWRealm(t *testing.T) {
-	rr, err := NewClient().GetRaidRankings(&RaidQuery{
+	c := raiderio.NewClient()
+
+	rr, err := c.GetRaidRankings(&raiderio.RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
-		Difficulty: MythicRaid,
+		Difficulty: raiderio.MythicRaid,
 		Region:     region.US,
 		Realm:      "illidan",
 	})
@@ -154,9 +185,11 @@ func TestGetRaidRankingsWRealm(t *testing.T) {
 }
 
 func TestGetRaidRankingsWLimit(t *testing.T) {
-	rr, err := NewClient().GetRaidRankings(&RaidQuery{
+	c := raiderio.NewClient()
+
+	rr, err := c.GetRaidRankings(&raiderio.RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
-		Difficulty: MythicRaid,
+		Difficulty: raiderio.MythicRaid,
 		Region:     region.US,
 		Limit:      2,
 	})

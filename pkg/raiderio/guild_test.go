@@ -1,10 +1,14 @@
 package raiderio
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+)
 
 func TestCreateGuildQuery(t *testing.T) {
 	gq := GuildQuery{
-		Region: "us",
+		Region: region.US,
 		Realm:  "illidan",
 		Name:   "liquid",
 	}
@@ -18,7 +22,7 @@ func TestCreateGuildQuery(t *testing.T) {
 
 func TestCreateGuildQueryWMembers(t *testing.T) {
 	gq := GuildQuery{
-		Region:  "us",
+		Region:  region.US,
 		Realm:   "illidan",
 		Name:    "liquid",
 		Members: true,
@@ -36,7 +40,7 @@ func TestCreateGuildQueryWMembers(t *testing.T) {
 
 func TestCreateGuildQueryWRaidProgression(t *testing.T) {
 	gq := GuildQuery{
-		Region:          "us",
+		Region:          region.US,
 		Realm:           "illidan",
 		Name:            "liquid",
 		RaidProgression: true,
