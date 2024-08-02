@@ -1,9 +1,14 @@
 .DEFAULT_GOAL := build
 
+setup:
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+
 clean:
 	go clean
 
 build: clean
+	staticcheck ./...
+	go vet ./...
 	go build ./...
 
 test: build
