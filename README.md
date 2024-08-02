@@ -37,7 +37,7 @@ profile, err := client.GetGuild(&gq)
 ### Get Raid Rankings for a specific raid
 ```go
 rq := raiderio.RaidQuery{
-	Name: 		"aberrus-the-shadowed-crucible",
+	Name: 		"nerubar-palace",
 	Difficulty:	raiderio.MythicRaid,
 	Region: 	region.US,
 	Limit: 		10,
@@ -48,5 +48,5 @@ rankings, err := client.GetRaidRankings(&rq)
 
 ### Get Static Raid data by expansion
 ```go
-raids, err := client.GetRaids(expansion.Dragonflight)
+raids, err := client.GetRaids(expansion.WarWithin)
 ```
