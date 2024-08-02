@@ -107,7 +107,7 @@ func validateCharacterQuery(cq *CharacterQuery) error {
 	}
 
 	if cq.TalentLoadout {
-		cq.fields = append(cq.fields, "talent_loadout")
+		cq.fields = append(cq.fields, "talents")
 	}
 
 	if cq.Gear {

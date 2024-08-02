@@ -44,23 +44,47 @@ func TestGetCharacterProfile(t *testing.T) {
 		}
 
 		if err == nil && profile.Name != tc.expectedName {
-			t.Fatalf("expected: %v, got: %v", tc.expectedName, profile.Name)
+			t.Fatalf("character name expected: %v, got: %v", tc.expectedName, profile.Name)
 		}
 	}
 }
 
 func TestGetCharacterWGear(t *testing.T) {
-	profile, err := raiderio.NewClient().GetCharacter(&raiderio.CharacterQuery{
-		Region: region.US,
-		Realm:  "illidan",
-		Name:   "highervalue",
-		Gear:   true,
-	})
+	c := raiderio.NewClient()
 
-	if err != nil {
-		t.Errorf("Error getting character")
+	testCases := []struct {
+		region         *region.Region
+		realm          string
+		name           string
+		expectedErrMsg string
+		expectedName   string
+	}{
+		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
+		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, failed to find region badregion"},
+		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, could not find requested character"},
+		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "status code: 400, error: bad request, failed to find realm invalidrealm in region us"},
 	}
-	t.Logf("%+v", profile)
+
+	for _, tc := range testCases {
+		profile, err := c.GetCharacter(&raiderio.CharacterQuery{
+			Region: tc.region,
+			Realm:  tc.realm,
+			Name:   tc.name,
+			Gear:   true,
+		})
+
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("expected: %v, got: %v", tc.expectedErrMsg, err.Error())
+		}
+
+		if err == nil && profile.Name != tc.expectedName {
+			t.Fatalf("character name expected: %v, got: %v. item level equipped: %d", tc.expectedName, profile.Name, profile.Gear.ItemLevelEquipped)
+		}
+
+		if err == nil && !(profile.Gear.ItemLevelEquipped > 0) {
+			t.Fatalf("character item level equipped: %d, expected > 0", profile.Gear.ItemLevelEquipped)
+		}
+	}
 }
 
 func TestGetCharacterWTalents(t *testing.T) {
@@ -73,28 +97,42 @@ func TestGetCharacterWTalents(t *testing.T) {
 	}
 
 	profile, err := c.GetCharacter(&cq)
-
-	if err != nil {
-		t.Errorf("Error getting character")
+	if err == nil && profile.TalentLoadout.LoadoutText == "" {
+		t.Fatalf("talent loadout: %v expected to not be empty", profile.TalentLoadout.LoadoutText)
 	}
-	t.Logf("%+v", profile)
-	t.Logf(profile.Class)
 }
 
 func TestGetGuild(t *testing.T) {
 	c := raiderio.NewClient()
 
-	gq := raiderio.GuildQuery{
-		Region: region.US,
-		Realm:  "illidan",
-		Name:   "warpath",
+	testCases := []struct {
+		region         *region.Region
+		realm          string
+		name           string
+		expectedErrMsg string
+		expectedName   string
+	}{
+		{region: region.US, realm: "illidan", name: "warpath", expectedName: "Warpath"},
+		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "warpath", expectedErrMsg: "status code: 400, error: bad request, failed to find region badregion"},
+		{region: region.US, realm: "illidan", name: "impossible_guild_name", expectedErrMsg: "status code: 400, error: bad request, could not find requested guild"},
+		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "status code: 400, error: bad request, failed to find realm invalidrealm in region us"},
 	}
 
-	profile, err := c.GetGuild(&gq)
-	if err != nil {
-		t.Errorf("Error getting guild")
+	for _, tc := range testCases {
+		profile, err := c.GetGuild(&raiderio.GuildQuery{
+			Region: tc.region,
+			Realm:  tc.realm,
+			Name:   tc.name,
+		})
+
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("expected: %v, got: %v", tc.expectedErrMsg, err.Error())
+		}
+
+		if err == nil && profile.Name != tc.expectedName {
+			t.Fatalf("guild name expected: %v, got: %v.", tc.expectedName, profile.Name)
+		}
 	}
-	t.Logf("%+v", profile)
 }
 
 func TestGetGuildWMembers(t *testing.T) {
