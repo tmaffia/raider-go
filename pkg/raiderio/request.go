@@ -3,9 +3,7 @@ package raiderio
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
-	"strings"
 )
 
 type apiErrorResponse struct {
@@ -29,11 +27,7 @@ func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 	var body []byte
 	body, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, &apiErrorResponse{
-			StatusCode: resp.StatusCode,
-			Err:        err.Error(),
-			Message:    "error reading response body",
-		}
+		return nil, errors.New("error reading response body")
 	}
 
 	// If not 200, api is returning an error state
@@ -43,16 +37,12 @@ func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 		// unmarshal error implies response is in an incorrect format
 		// instead of api message, return http status
 		if err != nil {
-			return nil, &responseBody
+			return nil, wrapAPIError(&responseBody)
 		}
 
 		// return error with message directly from the api
-		return nil, &responseBody
+		return nil, wrapAPIError(&responseBody)
 	}
 
 	return body, nil
-}
-
-func (e *apiErrorResponse) Error() string {
-	return strings.ToLower(fmt.Sprintf("status code: %d, error: %s, %s", e.StatusCode, e.Err, e.Message))
 }

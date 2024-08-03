@@ -27,9 +27,12 @@ func TestGetCharacterProfile(t *testing.T) {
 		expectedName   string
 	}{
 		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
-		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, failed to find region badregion"},
-		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, could not find requested character"},
-		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "status code: 400, error: bad request, failed to find realm invalidrealm in region us"},
+		{region: region.US, realm: "", name: "highervalue", expectedErrMsg: "invalid realm"},
+		{region: region.US, realm: "illidan", name: "", expectedErrMsg: "invalid character name"},
+		{region: nil, realm: "illidan", name: "highervalue", expectedErrMsg: "invalid region"},
+		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "invalid region"},
+		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "character not found"},
+		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
 	}
 
 	for _, tc := range testCases {
@@ -60,9 +63,6 @@ func TestGetCharacterWGear(t *testing.T) {
 		expectedName   string
 	}{
 		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
-		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, failed to find region badregion"},
-		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "status code: 400, error: bad request, could not find requested character"},
-		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "status code: 400, error: bad request, failed to find realm invalidrealm in region us"},
 	}
 
 	for _, tc := range testCases {
@@ -113,9 +113,12 @@ func TestGetGuild(t *testing.T) {
 		expectedName   string
 	}{
 		{region: region.US, realm: "illidan", name: "warpath", expectedName: "Warpath"},
-		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "warpath", expectedErrMsg: "status code: 400, error: bad request, failed to find region badregion"},
-		{region: region.US, realm: "illidan", name: "impossible_guild_name", expectedErrMsg: "status code: 400, error: bad request, could not find requested guild"},
-		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "status code: 400, error: bad request, failed to find realm invalidrealm in region us"},
+		{region: region.US, realm: "", name: "warpath", expectedErrMsg: "invalid realm"},
+		{region: region.US, realm: "illidan", name: "", expectedErrMsg: "invalid guild name"},
+		{region: nil, realm: "illidan", name: "highervalue", expectedErrMsg: "invalid region"},
+		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "warpath", expectedErrMsg: "invalid region"},
+		{region: region.US, realm: "illidan", name: "impossible_guild_name", expectedErrMsg: "guild not found"},
+		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
 	}
 
 	for _, tc := range testCases {

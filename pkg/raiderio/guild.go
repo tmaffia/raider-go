@@ -1,8 +1,6 @@
 package raiderio
 
 import (
-	"errors"
-
 	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
 
@@ -60,15 +58,15 @@ type GuildRaidRankings struct {
 // or if the fields are invalid
 func createGuildQuery(gq *GuildQuery) error {
 	if gq.Region == nil {
-		return errors.New("region error")
+		return ErrInvalidRegion
 	}
 
 	if gq.Realm == "" {
-		return errors.New("realm error")
+		return ErrInvalidRealm
 	}
 
 	if gq.Name == "" {
-		return errors.New("name error")
+		return ErrInvalidGuildName
 	}
 
 	if gq.Members {

@@ -144,15 +144,15 @@ const (
 // ensures that the required parameters are not empty
 func validateRaidRankingsQuery(rq *RaidQuery) error {
 	if rq.Name == "" {
-		return errors.New("no raid name provided")
+		return ErrInvalidRaidName
 	}
 
 	if rq.Difficulty == "" {
-		return errors.New("no raid difficulty provided")
+		return ErrInvalidRaidDiff
 	}
 
 	if rq.Region == nil {
-		return errors.New("no region provided")
+		return ErrInvalidRegion
 	}
 
 	if rq.Limit < 0 {

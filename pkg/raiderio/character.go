@@ -1,8 +1,6 @@
 package raiderio
 
 import (
-	"errors"
-
 	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
 
@@ -95,15 +93,15 @@ type TalentLoadout struct {
 // or if the fields are invalid
 func validateCharacterQuery(cq *CharacterQuery) error {
 	if cq.Region == nil {
-		return errors.New("region error")
+		return ErrInvalidRegion
 	}
 
 	if cq.Realm == "" {
-		return errors.New("realm error")
+		return ErrInvalidRealm
 	}
 
 	if cq.Name == "" {
-		return errors.New("name error")
+		return ErrInvalidCharName
 	}
 
 	if cq.TalentLoadout {
