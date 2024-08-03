@@ -140,64 +140,125 @@ func TestGetGuild(t *testing.T) {
 
 func TestGetGuildWMembers(t *testing.T) {
 	c := raiderio.NewClient()
-
-	profile, err := c.GetGuild((&raiderio.GuildQuery{
-		Region:  region.US,
-		Realm:   "illidan",
-		Name:    "warpath",
-		Members: true,
-	}))
-
-	if err != nil {
-		t.Errorf("Error getting guild")
+	testCases := []struct {
+		region *region.Region
+		realm  string
+		name   string
+	}{
+		{region: region.US, realm: "illidan", name: "warpath"},
 	}
-	t.Logf("%+v", profile)
+
+	for range testCases {
+		profile, err := c.GetGuild((&raiderio.GuildQuery{
+			Region:  region.US,
+			Realm:   "illidan",
+			Name:    "warpath",
+			Members: true,
+		}))
+
+		if err != nil {
+			t.Fatalf("Error getting guild")
+		}
+
+		if !(len(profile.Members) > 0) {
+			t.Fatalf("Error getting guild members")
+		}
+	}
+
 }
 
 func TestGetGuildWRaidProgression(t *testing.T) {
 	c := raiderio.NewClient()
-
-	profile, err := c.GetGuild(&raiderio.GuildQuery{
-		Region:          region.US,
-		Realm:           "illidan",
-		Name:            "warpath",
-		RaidProgression: true,
-	})
-
-	if err != nil {
-		t.Errorf("Error getting guild")
+	testCases := []struct {
+		region *region.Region
+		realm  string
+		name   string
+	}{
+		{region: region.US, realm: "illidan", name: "warpath"},
 	}
-	t.Logf("%+v", profile)
+
+	for range testCases {
+		profile, err := c.GetGuild(&raiderio.GuildQuery{
+			Region:          region.US,
+			Realm:           "illidan",
+			Name:            "warpath",
+			RaidProgression: true,
+		})
+
+		if err != nil {
+			t.Errorf("Error getting guild")
+		}
+
+		if profile.RaidProgression.Aberrus.Summary == "" {
+			t.Fatalf("Error getting guild raid progression, got: %v", profile.RaidProgression.Amirdrassil.Summary)
+		}
+	}
 }
 
 func TestGetGuildWRaidRankings(t *testing.T) {
 	c := raiderio.NewClient()
-	profile, err := c.GetGuild(&raiderio.GuildQuery{
-		Region:       region.US,
-		Realm:        "illidan",
-		Name:         "warpath",
-		RaidRankings: true,
-	})
-
-	if err != nil {
-		t.Errorf("Error getting guild")
+	testCases := []struct {
+		region       *region.Region
+		realm        string
+		name         string
+		raidName     string
+		expectedRank int
+	}{
+		{region: region.US, realm: "illidan", name: "warpath",
+			raidName: "aberrus-the-shadowed-crucible", expectedRank: 158},
 	}
-	t.Logf("%+v", profile)
+
+	for _, tc := range testCases {
+		profile, err := c.GetGuild(&raiderio.GuildQuery{
+			Region:       region.US,
+			Realm:        "illidan",
+			Name:         "warpath",
+			RaidRankings: true,
+		})
+
+		if err != nil {
+			t.Errorf("Error getting guild")
+		}
+
+		rank := profile.RaidRankings[tc.raidName]
+
+		if rank.Mythic.World != tc.expectedRank {
+			t.Fatalf("mythic guild ranking for raid: %v, got: %d, expected: %d",
+				rank.RaidSlug, rank.Mythic.World, tc.expectedRank)
+		}
+	}
 }
 
 func TestGetRaids(t *testing.T) {
 	c := raiderio.NewClient()
-	raids, err := c.GetRaids(expansion.Dragonflight)
+	testCases := []struct {
+		expansion        expansion.Expansion
+		raidName         string
+		expectedRaidName string
+		expectedErrMsg   string
+	}{
+		{expansion: expansion.Dragonflight},
+		{expansion: 2, expectedErrMsg: "unexpected error"},
+	}
+
+	for _, tc := range testCases {
+		_, err := c.GetRaids(tc.expansion)
+
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("expected error: %v, got %v", tc.expectedErrMsg, err.Error())
+		}
+	}
+
+	_, err := c.GetRaids(expansion.Dragonflight)
 	if err != nil {
 		t.Errorf("Error getting raids")
 	}
-	t.Logf("%+v", raids)
 }
 
 func TestGetRaidRankings(t *testing.T) {
 	c := raiderio.NewClient()
 
-	rr, err := c.GetRaidRankings(&raiderio.RaidQuery{
+	_, err := c.GetRaidRankings(&raiderio.RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
 		Difficulty: raiderio.MythicRaid,
 		Region:     region.WORLD,
@@ -206,13 +267,12 @@ func TestGetRaidRankings(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error getting raid rankings: " + err.Error())
 	}
-	t.Logf("%+v", rr)
 }
 
 func TestGetRaidRankingsWRealm(t *testing.T) {
 	c := raiderio.NewClient()
 
-	rr, err := c.GetRaidRankings(&raiderio.RaidQuery{
+	_, err := c.GetRaidRankings(&raiderio.RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
 		Difficulty: raiderio.MythicRaid,
 		Region:     region.US,
@@ -222,13 +282,12 @@ func TestGetRaidRankingsWRealm(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error getting raid rankings: " + err.Error())
 	}
-	t.Logf("%+v", rr)
 }
 
 func TestGetRaidRankingsWLimit(t *testing.T) {
 	c := raiderio.NewClient()
 
-	rr, err := c.GetRaidRankings(&raiderio.RaidQuery{
+	_, err := c.GetRaidRankings(&raiderio.RaidQuery{
 		Name:       "aberrus-the-shadowed-crucible",
 		Difficulty: raiderio.MythicRaid,
 		Region:     region.US,
@@ -238,5 +297,4 @@ func TestGetRaidRankingsWLimit(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error getting raid rankings: " + err.Error())
 	}
-	t.Logf("%+v", rr)
 }

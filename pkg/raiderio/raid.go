@@ -71,7 +71,8 @@ type RaidProgression struct {
 // in a guild profile response
 // Includes Normal Heroic and Mythic rankings
 type GuildRaidRanking struct {
-	Normal struct {
+	RaidSlug string
+	Normal   struct {
 		World  int `json:"world"`
 		Region int `json:"region"`
 		Realm  int `json:"realm"`
@@ -164,4 +165,13 @@ func validateRaidRankingsQuery(rq *RaidQuery) error {
 	}
 
 	return nil
+}
+
+func (r *Raids) GetRaidBySlug(slug string) (*Raid, error) {
+	for _, raid := range r.Raids {
+		if raid.Slug == slug {
+			return &raid, nil
+		}
+	}
+	return nil, ErrInvalidRaid
 }

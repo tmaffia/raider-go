@@ -73,12 +73,13 @@ func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
 	if err != nil {
 		return nil, err
 	}
-	var profile Guild
-	err = json.Unmarshal(body, &profile)
+
+	profile, err := unmarshalGuild(body)
 	if err != nil {
-		return nil, errors.New("error unmarshalling guild profile")
+		return nil, err
 	}
-	return &profile, nil
+
+	return profile, nil
 }
 
 // GetRaids retrieves a list of raids from the Raider.IO API

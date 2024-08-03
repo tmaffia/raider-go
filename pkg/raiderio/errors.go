@@ -12,6 +12,8 @@ var (
 	ErrInvalidGuildName  = errors.New("invalid guild name")
 	ErrInvalidRaidName   = errors.New("invalid raid name")
 	ErrInvalidRaidDiff   = errors.New("invalid raid difficulty")
+	ErrInvalidRaid       = errors.New("invalid raid")
+	ErrFieldMissing      = errors.New("field missing from api response")
 	ErrCharacterNotFound = errors.New("character not found")
 	ErrGuildNotFound     = errors.New("guild not found")
 	ErrUnexpected        = errors.New("unexpected error")
