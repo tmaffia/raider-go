@@ -8,8 +8,6 @@ import (
 )
 
 func TestGetGuildRaidRankBySlug(t *testing.T) {
-	c := raiderio.NewClient()
-
 	testCases := []struct {
 		region              *region.Region
 		realm               string
@@ -26,7 +24,7 @@ func TestGetGuildRaidRankBySlug(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		profile, _ := c.GetGuild(&raiderio.GuildQuery{
+		profile, _ := c.GetGuild(defaultCtx, &raiderio.GuildQuery{
 			Region:       tc.region,
 			Realm:        tc.realm,
 			Name:         tc.name,

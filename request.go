@@ -1,9 +1,11 @@
 package raiderio
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
+	"net/http"
 )
 
 type apiErrorResponse struct {
@@ -18,10 +20,15 @@ type apiErrorResponse struct {
 // Returns the error message from the api back to the client method that calls it,
 // so in cases where the realm or the character name cannot be found, developer is presented
 // with that error state.
-func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
-	resp, err := c.HttpClient.Get(reqUrl)
+func (c *Client) getAPIResponse(ctx context.Context, reqUrl string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqUrl, nil)
 	if err != nil {
-		return nil, errors.New("HTTP error on API request")
+		return nil, errors.New("error creating HTTP request")
+	}
+
+	resp, err := c.HttpClient.Do(req)
+	if err != nil {
+		return nil, wrapHttpError(err)
 	}
 
 	var body []byte
@@ -37,11 +44,11 @@ func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 		// unmarshal error implies response is in an incorrect format
 		// instead of api message, return http status
 		if err != nil {
-			return nil, wrapAPIError(&responseBody)
+			return nil, wrapApiError(&responseBody)
 		}
 
 		// return error with message directly from the api
-		return nil, wrapAPIError(&responseBody)
+		return nil, wrapApiError(&responseBody)
 	}
 
 	return body, nil

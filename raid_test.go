@@ -3,13 +3,10 @@ package raiderio_test
 import (
 	"testing"
 
-	"github.com/tmaffia/raiderio"
 	"github.com/tmaffia/raiderio/expansion"
 )
 
 func TestGetRaidBySlug(t *testing.T) {
-	c := raiderio.NewClient()
-
 	testCases := []struct {
 		slug           string
 		expectedName   string
@@ -17,9 +14,10 @@ func TestGetRaidBySlug(t *testing.T) {
 	}{
 		{slug: "aberrus-the-shadowed-crucible", expectedName: "Aberrus, the Shadowed Crucible"},
 		{slug: "invalid raid slug", expectedErrMsg: "invalid raid"},
+		{slug: "aberrus-the-shadowed-crucibleinvalid raid slug", expectedErrMsg: "invalid raid"},
 	}
 
-	raids, _ := c.GetRaids(expansion.Dragonflight)
+	raids, _ := c.GetRaids(defaultCtx, expansion.Dragonflight)
 
 	for _, tc := range testCases {
 		raid, err := raids.GetRaidBySlug(tc.slug)

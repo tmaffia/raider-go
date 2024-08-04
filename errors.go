@@ -19,12 +19,13 @@ var (
 	ErrUnsupportedExpac  = errors.New("unsupported expansion")
 	ErrLimitOutOfBounds  = errors.New("limit must be a positive int")
 	ErrPageOutOfBounds   = errors.New("page must be a positive int")
+	ErrApiTimeout        = errors.New("raiderio api request timeout")
 	ErrUnexpected        = errors.New("unexpected error")
 )
 
 // Turns api errors into standardized go errors with
 // consistent error messages
-func wrapAPIError(responseBody *apiErrorResponse) error {
+func wrapApiError(responseBody *apiErrorResponse) error {
 	if strings.Contains(responseBody.Message, "Failed to find region") {
 		return ErrInvalidRegion
 	}
@@ -49,5 +50,12 @@ func wrapAPIError(responseBody *apiErrorResponse) error {
 		return ErrInvalidRaid
 	}
 
+	return ErrUnexpected
+}
+
+func wrapHttpError(err error) error {
+	if strings.Contains(err.Error(), "context deadline exceeded") {
+		return ErrApiTimeout
+	}
 	return ErrUnexpected
 }
