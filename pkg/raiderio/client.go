@@ -112,7 +112,7 @@ func (c *Client) GetRaidRankings(rq *RaidQuery) (*RaidRankings, error) {
 		return nil, err
 	}
 
-	reqUrl := c.ApiUrl + "/raiding/raid-rankings?raid=" + rq.Name +
+	reqUrl := c.ApiUrl + "/raiding/raid-rankings?raid=" + rq.Slug +
 		"&difficulty=" + string(rq.Difficulty) + "&region=" + rq.Region.Slug
 
 	if rq.Realm != "" {

@@ -234,38 +234,80 @@ func TestGetRaids(t *testing.T) {
 	testCases := []struct {
 		expansion        expansion.Expansion
 		raidName         string
+		raidDifficulty   string
 		expectedRaidName string
 		expectedErrMsg   string
 	}{
-		{expansion: expansion.Dragonflight},
-		{expansion: 2, expectedErrMsg: "unexpected error"},
+		{expansion: expansion.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedRaidName: "Aberrus, the Shadowed Crucible"},
+		{expansion: 2, expectedErrMsg: "unsupported expansion"},
 	}
 
 	for _, tc := range testCases {
-		_, err := c.GetRaids(tc.expansion)
+		raids, err := c.GetRaids(tc.expansion)
 
 		if err != nil && err.Error() != tc.expectedErrMsg {
 			t.Fatalf("expected error: %v, got %v", tc.expectedErrMsg, err.Error())
 		}
-	}
 
-	_, err := c.GetRaids(expansion.Dragonflight)
-	if err != nil {
-		t.Errorf("Error getting raids")
+		if err == nil {
+			raid, _ := raids.GetRaidBySlug(tc.raidName)
+			if raid.Name != tc.expectedRaidName {
+				t.Fatalf("expected raid name: %v, got: %v", tc.expectedRaidName, raid.Name)
+			}
+		}
+
 	}
 }
 
 func TestGetRaidRankings(t *testing.T) {
 	c := raiderio.NewClient()
+	testCases := []struct {
+		slug                   string
+		difficulty             raiderio.RaidDifficulty
+		region                 *region.Region
+		realm                  string
+		limit                  int
+		page                   int
+		expectedErrMsg         string
+		expectedRank1GuildName string
+	}{
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, expectedRank1GuildName: "Liquid"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "mythic", region: region.EU, expectedRank1GuildName: "Echo"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, realm: "illidan", expectedRank1GuildName: "Liquid"},
+		{slug: "invalid raid slug", difficulty: raiderio.MythicRaid, region: region.US, realm: "illidan", expectedErrMsg: "invalid raid"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "mythic", region: nil, realm: "illidan", expectedErrMsg: "invalid region"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "", region: region.US, realm: "illidan", expectedErrMsg: "invalid raid difficulty"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "invalid-difficulty", region: region.US, realm: "illidan", expectedErrMsg: "invalid raid difficulty"},
+		{slug: "", difficulty: raiderio.MythicRaid, region: region.US, realm: "illidan", expectedErrMsg: "invalid raid name"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, expectedRank1GuildName: "Liquid", limit: 20},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, limit: -20, expectedErrMsg: "limit must be a positive int"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, expectedRank1GuildName: "Accession", limit: 40, page: 2},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, limit: 40, page: -2, expectedErrMsg: "page must be a positive int"},
+	}
 
-	_, err := c.GetRaidRankings(&raiderio.RaidQuery{
-		Name:       "aberrus-the-shadowed-crucible",
-		Difficulty: raiderio.MythicRaid,
-		Region:     region.WORLD,
-	})
+	for _, tc := range testCases {
+		rankings, err := c.GetRaidRankings(&raiderio.RaidQuery{
+			Slug:       tc.slug,
+			Difficulty: raiderio.RaidDifficulty(tc.difficulty),
+			Region:     tc.region,
+			Limit:      tc.limit,
+			Page:       tc.page,
+		})
 
-	if err != nil {
-		t.Errorf("Error getting raid rankings: " + err.Error())
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("expected error: %v, got: %v", tc.expectedErrMsg, err.Error())
+		}
+
+		if err == nil && rankings.RaidRanking[0].Guild.Name != tc.expectedRank1GuildName {
+			t.Fatalf("expected guild name: %v, got: %v", tc.expectedRank1GuildName, rankings.RaidRanking[0].Guild.Name)
+		}
+
+		if err == nil && tc.limit != 0 {
+			if len(rankings.RaidRanking) != tc.limit {
+				t.Fatalf("expected results limit: %v, got: %v", tc.limit, len(rankings.RaidRanking))
+			}
+
+		}
 	}
 }
 
@@ -273,7 +315,7 @@ func TestGetRaidRankingsWRealm(t *testing.T) {
 	c := raiderio.NewClient()
 
 	_, err := c.GetRaidRankings(&raiderio.RaidQuery{
-		Name:       "aberrus-the-shadowed-crucible",
+		Slug:       "aberrus-the-shadowed-crucible",
 		Difficulty: raiderio.MythicRaid,
 		Region:     region.US,
 		Realm:      "illidan",
@@ -288,7 +330,7 @@ func TestGetRaidRankingsWLimit(t *testing.T) {
 	c := raiderio.NewClient()
 
 	_, err := c.GetRaidRankings(&raiderio.RaidQuery{
-		Name:       "aberrus-the-shadowed-crucible",
+		Slug:       "aberrus-the-shadowed-crucible",
 		Difficulty: raiderio.MythicRaid,
 		Region:     region.US,
 		Limit:      2,

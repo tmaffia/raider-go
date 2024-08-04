@@ -1,8 +1,6 @@
 package raiderio
 
 import (
-	"errors"
-
 	"github.com/tmaffia/raiderio/pkg/raiderio/realm"
 	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
@@ -11,7 +9,7 @@ import (
 // sent for a raid request
 // Supports optional request fields: difficulty, region, realm, name
 type RaidQuery struct {
-	Name       string
+	Slug       string
 	Difficulty RaidDifficulty
 	Region     *region.Region
 	Realm      string
@@ -133,6 +131,7 @@ type Encounter struct {
 
 // RaidDifficulty is a string type that represents the difficulty of a raid
 // in a raid request
+// Options are "normal", "heroic", and "mythic"
 type RaidDifficulty string
 
 const (
@@ -141,14 +140,27 @@ const (
 	MythicRaid RaidDifficulty = "mythic"
 )
 
+// Validates raid difficulty before sending to the api
+// making an http request to the api with an invalid difficulty
+// results in an empty result instead of an error message. So
+// we add the error by checking for valid difficulty before sending
+// the request to the api
+func raidDifficltyValid(d RaidDifficulty) bool {
+	if d == NormalRaid || d == HeroicRaid || d == MythicRaid {
+		return true
+	}
+
+	return false
+}
+
 // validateRaidQuery validates a RaidQuery struct
 // ensures that the required parameters are not empty
 func validateRaidRankingsQuery(rq *RaidQuery) error {
-	if rq.Name == "" {
+	if rq.Slug == "" {
 		return ErrInvalidRaidName
 	}
 
-	if rq.Difficulty == "" {
+	if rq.Difficulty == "" || !raidDifficltyValid(rq.Difficulty) {
 		return ErrInvalidRaidDiff
 	}
 
@@ -157,11 +169,11 @@ func validateRaidRankingsQuery(rq *RaidQuery) error {
 	}
 
 	if rq.Limit < 0 {
-		return errors.New("limit must be a positive int")
+		return ErrLimitOutOfBounds
 	}
 
 	if rq.Page < 0 {
-		return errors.New("page must be a positive int")
+		return ErrPageOutOfBounds
 	}
 
 	return nil

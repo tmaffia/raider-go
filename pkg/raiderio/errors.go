@@ -16,6 +16,9 @@ var (
 	ErrFieldMissing      = errors.New("field missing from api response")
 	ErrCharacterNotFound = errors.New("character not found")
 	ErrGuildNotFound     = errors.New("guild not found")
+	ErrUnsupportedExpac  = errors.New("unsupported expansion")
+	ErrLimitOutOfBounds  = errors.New("limit must be a positive int")
+	ErrPageOutOfBounds   = errors.New("page must be a positive int")
 	ErrUnexpected        = errors.New("unexpected error")
 )
 
@@ -36,6 +39,14 @@ func wrapAPIError(responseBody *apiErrorResponse) error {
 
 	if strings.Contains(responseBody.Message, "Could not find requested guild") {
 		return ErrGuildNotFound
+	}
+
+	if strings.Contains(responseBody.Message, "Requested unsupported expansion_id") {
+		return ErrUnsupportedExpac
+	}
+
+	if strings.Contains(responseBody.Message, "Could not find requested raid") {
+		return ErrInvalidRaid
 	}
 
 	return ErrUnexpected
