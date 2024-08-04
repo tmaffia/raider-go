@@ -8,6 +8,11 @@ Wrapper for the raider.io API written in Go
 
 ## Usage
 
+### Include module in your go.mod 
+```
+include github.com/tmaffia/raiderio v0.3.0
+```
+
 ### Get a Character Profile
 ```go
 client, err := raiderio.NewClient()

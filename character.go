@@ -1,7 +1,7 @@
 package raiderio
 
 import (
-	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+	"github.com/tmaffia/raiderio/region"
 )
 
 // CharacterQuery is a struct that represents the query parameters

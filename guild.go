@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+	"github.com/tmaffia/raiderio/region"
 )
 
 // GuildQuery is a struct that represents the query parameters

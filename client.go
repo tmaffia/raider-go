@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/tmaffia/raiderio/pkg/raiderio/expansion"
+	"github.com/tmaffia/raiderio/expansion"
 )
 
 // Base URL for the Raider.IO API

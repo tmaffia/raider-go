@@ -3,8 +3,8 @@ package raiderio_test
 import (
 	"testing"
 
-	"github.com/tmaffia/raiderio/pkg/raiderio"
-	"github.com/tmaffia/raiderio/pkg/raiderio/expansion"
+	"github.com/tmaffia/raiderio"
+	"github.com/tmaffia/raiderio/expansion"
 )
 
 func TestGetRaidBySlug(t *testing.T) {

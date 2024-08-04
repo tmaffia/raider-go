@@ -1,8 +1,8 @@
 package raiderio
 
 import (
-	"github.com/tmaffia/raiderio/pkg/raiderio/realm"
-	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+	"github.com/tmaffia/raiderio/realm"
+	"github.com/tmaffia/raiderio/region"
 )
 
 // RaidQuery is a struct that represents the query parameters
