@@ -8,8 +8,6 @@ import (
 )
 
 func TestGetGuildRaidRankBySlug(t *testing.T) {
-	c := raiderio.NewClient()
-
 	testCases := []struct {
 		region              *region.Region
 		realm               string
