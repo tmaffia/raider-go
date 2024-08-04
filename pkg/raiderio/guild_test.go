@@ -1,53 +1,46 @@
-package raiderio
+package raiderio_test
 
-import "testing"
+import (
+	"testing"
 
-func TestCreateGuildQuery(t *testing.T) {
-	gq := GuildQuery{
-		Region: "us",
-		Realm:  "illidan",
-		Name:   "liquid",
-	}
+	"github.com/tmaffia/raiderio/pkg/raiderio"
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+)
 
-	err := createGuildQuery(&gq)
-	if err != nil {
-		t.Errorf("Error creating guild query")
-	}
-	t.Logf("%+v", gq)
-}
+func TestGetGuildRaidRankBySlug(t *testing.T) {
+	c := raiderio.NewClient()
 
-func TestCreateGuildQueryWMembers(t *testing.T) {
-	gq := GuildQuery{
-		Region:  "us",
-		Realm:   "illidan",
-		Name:    "liquid",
-		Members: true,
-	}
-
-	err := createGuildQuery(&gq)
-	if err != nil {
-		t.Errorf("Error creating guild query")
-	}
-	if gq.fields[0] != "members" {
-		t.Errorf("Error creating guild query")
-	}
-	t.Logf("%+v", gq)
-}
-
-func TestCreateGuildQueryWRaidProgression(t *testing.T) {
-	gq := GuildQuery{
-		Region:          "us",
-		Realm:           "illidan",
-		Name:            "liquid",
-		RaidProgression: true,
+	testCases := []struct {
+		region              *region.Region
+		realm               string
+		name                string
+		includeRandRankings bool
+		raidSlug            string
+		expectedRaidRank    int
+		expectedErrMsg      string
+	}{
+		{region: region.US, realm: "illidan", name: "warpath", raidSlug: "aberrus-the-shadowed-crucible", expectedRaidRank: 158, includeRandRankings: true},
+		{region: region.US, realm: "illidan", name: "warpath", raidSlug: "invalid raid slug", expectedErrMsg: "invalid raid", includeRandRankings: true},
+		{region: region.US, realm: "illidan", name: "warpath", raidSlug: "aberrus-the-shadowed-crucible",
+			expectedErrMsg: "guild raid rankings field missing from api response", includeRandRankings: false},
 	}
 
-	err := createGuildQuery(&gq)
-	if err != nil {
-		t.Errorf("Error creating guild query")
+	for _, tc := range testCases {
+		profile, _ := c.GetGuild(&raiderio.GuildQuery{
+			Region:       tc.region,
+			Realm:        tc.realm,
+			Name:         tc.name,
+			RaidRankings: tc.includeRandRankings,
+		})
+
+		rank, err := profile.GetGuildRaidRankBySlug(tc.raidSlug)
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("expected error: %v, got: %v", tc.expectedErrMsg, err.Error())
+		}
+
+		if err == nil && rank.Mythic.World != tc.expectedRaidRank {
+			t.Fatalf("mythic guild ranking for raid: %v, got: %d, expected: %d",
+				rank.RaidSlug, rank.Mythic.World, tc.expectedRaidRank)
+		}
 	}
-	if gq.fields[0] != "raid_progression" {
-		t.Errorf("Error creating guild query")
-	}
-	t.Logf("%+v", gq)
 }

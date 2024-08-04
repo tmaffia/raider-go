@@ -1,12 +1,17 @@
 package raiderio
 
-import "errors"
+import (
+	"encoding/json"
+	"errors"
+
+	"github.com/tmaffia/raiderio/pkg/raiderio/region"
+)
 
 // GuildQuery is a struct that represents the query parameters
 // sent for a guild profile request
 // Supports optional request fields: members, raid_progression, raid_rankings
 type GuildQuery struct {
-	Region          string
+	Region          *region.Region
 	Realm           string
 	Name            string
 	Members         bool
@@ -18,15 +23,15 @@ type GuildQuery struct {
 // Guild is a struct that represents the response from
 // a guild profile request
 type Guild struct {
-	Name            string               `json:"name"`
-	Faction         string               `json:"faction"`
-	Region          string               `json:"region"`
-	Realm           string               `json:"realm"`
-	LastCrawledAt   string               `json:"last_crawled_at"`
-	ProfileUrl      string               `json:"profile_url"`
-	Members         []Member             `json:"members"`
-	RaidProgression GuildRaidProgression `json:"raid_progression"`
-	RaidRankings    GuildRaidRankings    `json:"raid_rankings"`
+	Name            string                      `json:"name"`
+	Faction         string                      `json:"faction"`
+	Region          string                      `json:"region"`
+	Realm           string                      `json:"realm"`
+	LastCrawledAt   string                      `json:"last_crawled_at"`
+	ProfileUrl      string                      `json:"profile_url"`
+	Members         []Member                    `json:"members"`
+	RaidProgression GuildRaidProgression        `json:"raid_progression"`
+	RaidRankings    map[string]GuildRaidRanking `json:"raid_rankings"`
 }
 
 // Member is a struct that represents a member of a guild
@@ -45,26 +50,20 @@ type GuildRaidProgression struct {
 	VaultOfTheIncarnates RaidProgression `json:"vault-of-the-incarnates"`
 }
 
-type GuildRaidRankings struct {
-	Amirdrassil          GuildRaidRanking `json:"amirdrassil-amirdrassil-the-dreams-hope"`
-	Abberus              GuildRaidRanking `json:"aberrus-the-shadowed-crucible"`
-	VaultOfTheIncarnates GuildRaidRanking `json:"vault-of-the-incarnates"`
-}
-
 // createGuildQuery creates and validates a GuildQuery struct
 // It returns an error if any of the required parameters are empty
 // or if the fields are invalid
 func createGuildQuery(gq *GuildQuery) error {
-	if gq.Region == "" {
-		return errors.New("region error")
+	if gq.Region == nil {
+		return ErrInvalidRegion
 	}
 
 	if gq.Realm == "" {
-		return errors.New("realm error")
+		return ErrInvalidRealm
 	}
 
 	if gq.Name == "" {
-		return errors.New("name error")
+		return ErrInvalidGuildName
 	}
 
 	if gq.Members {
@@ -79,4 +78,33 @@ func createGuildQuery(gq *GuildQuery) error {
 		gq.fields = append(gq.fields, "raid_rankings")
 	}
 	return nil
+}
+
+func (g *Guild) GetGuildRaidRankBySlug(slug string) (*GuildRaidRanking, error) {
+	if g.RaidRankings == nil {
+		return nil, errors.New("guild raid rankings " + ErrFieldMissing.Error())
+	}
+
+	gr, ok := g.RaidRankings[slug]
+	if !ok {
+		return nil, ErrInvalidRaid
+	}
+
+	return &gr, nil
+}
+
+func unmarshalGuild(body []byte) (*Guild, error) {
+	var profile Guild
+	err := json.Unmarshal(body, &profile)
+	if err != nil {
+		return nil, errors.New("error unmarshalling guild profile")
+	}
+
+	for k := range profile.RaidRankings {
+		if entry, ok := profile.RaidRankings[k]; ok {
+			entry.RaidSlug = k
+			profile.RaidRankings[k] = entry
+		}
+	}
+	return &profile, nil
 }

@@ -11,14 +11,15 @@ Wrapper for the raider.io API written in Go
 ### Get a Character Profile
 ```go
 client, err := raiderio.NewClient()
-cq := raiderio.CharacterQuery{
-	Region:        region.US,
-	Realm:         "illidan",
-	Name:          "highervalue",
-	TalentLoadout: true,
-}
 
-profile, err := client.GetCharacter(&cq)
+profile, err := client.GetCharacter(&CharacterQuery{
+	Region: region.US,
+	Realm:  "illidan",
+	Name:   "thehighvalue",
+	TalentLoadout: true,
+})
+
+fmt.Println(profile.Class) // Mage
 ```
 
 ### Get a Guild Profile
@@ -36,7 +37,7 @@ profile, err := client.GetGuild(&gq)
 ### Get Raid Rankings for a specific raid
 ```go
 rq := raiderio.RaidQuery{
-	Name: 		"aberrus-the-shadowed-crucible",
+	Name: 		"nerubar-palace",
 	Difficulty:	raiderio.MythicRaid,
 	Region: 	region.US,
 	Limit: 		10,
@@ -47,5 +48,5 @@ rankings, err := client.GetRaidRankings(&rq)
 
 ### Get Static Raid data by expansion
 ```go
-raids, err := client.GetRaids(expansion.Dragonflight)
+raids, err := client.GetRaids(expansion.WarWithin)
 ```

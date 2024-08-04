@@ -1,8 +1,6 @@
 package raiderio
 
 import (
-	"errors"
-
 	"github.com/tmaffia/raiderio/pkg/raiderio/realm"
 	"github.com/tmaffia/raiderio/pkg/raiderio/region"
 )
@@ -11,9 +9,9 @@ import (
 // sent for a raid request
 // Supports optional request fields: difficulty, region, realm, name
 type RaidQuery struct {
-	Name       string
+	Slug       string
 	Difficulty RaidDifficulty
-	Region     string
+	Region     *region.Region
 	Realm      string
 	Limit      int
 	Page       int
@@ -71,7 +69,8 @@ type RaidProgression struct {
 // in a guild profile response
 // Includes Normal Heroic and Mythic rankings
 type GuildRaidRanking struct {
-	Normal struct {
+	RaidSlug string
+	Normal   struct {
 		World  int `json:"world"`
 		Region int `json:"region"`
 		Realm  int `json:"realm"`
@@ -132,6 +131,7 @@ type Encounter struct {
 
 // RaidDifficulty is a string type that represents the difficulty of a raid
 // in a raid request
+// Options are "normal", "heroic", and "mythic"
 type RaidDifficulty string
 
 const (
@@ -140,28 +140,50 @@ const (
 	MythicRaid RaidDifficulty = "mythic"
 )
 
+// Validates raid difficulty before sending to the api
+// making an http request to the api with an invalid difficulty
+// results in an empty result instead of an error message. So
+// we add the error by checking for valid difficulty before sending
+// the request to the api
+func raidDifficltyValid(d RaidDifficulty) bool {
+	if d == NormalRaid || d == HeroicRaid || d == MythicRaid {
+		return true
+	}
+
+	return false
+}
+
 // validateRaidQuery validates a RaidQuery struct
 // ensures that the required parameters are not empty
 func validateRaidRankingsQuery(rq *RaidQuery) error {
-	if rq.Name == "" {
-		return errors.New("no raid name provided")
+	if rq.Slug == "" {
+		return ErrInvalidRaidName
 	}
 
-	if rq.Difficulty == "" {
-		return errors.New("no raid difficulty provided")
+	if rq.Difficulty == "" || !raidDifficltyValid(rq.Difficulty) {
+		return ErrInvalidRaidDiff
 	}
 
-	if rq.Region == "" {
-		return errors.New("no region provided")
+	if rq.Region == nil {
+		return ErrInvalidRegion
 	}
 
 	if rq.Limit < 0 {
-		return errors.New("limit must be a positive int")
+		return ErrLimitOutOfBounds
 	}
 
 	if rq.Page < 0 {
-		return errors.New("page must be a positive int")
+		return ErrPageOutOfBounds
 	}
 
 	return nil
+}
+
+func (r *Raids) GetRaidBySlug(slug string) (*Raid, error) {
+	for _, raid := range r.Raids {
+		if raid.Slug == slug {
+			return &raid, nil
+		}
+	}
+	return nil, ErrInvalidRaid
 }

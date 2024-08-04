@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -16,15 +15,15 @@ const baseUrl string = "https://raider.io/api"
 
 // Client is the main struct for interacting with the Raider.IO API
 type Client struct {
-	apiUrl     string
-	httpClient *http.Client
+	ApiUrl     string
+	HttpClient *http.Client
 }
 
 // NewClient creates a new Client struct
 func NewClient() *Client {
 	var c Client
-	c.apiUrl = baseUrl + "/v1"
-	c.httpClient = &http.Client{}
+	c.ApiUrl = baseUrl + "/v1"
+	c.HttpClient = &http.Client{}
 	return &c
 }
 
@@ -37,7 +36,7 @@ func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
 		return nil, err
 	}
 
-	reqUrl := c.apiUrl + "/characters/profile?region=" + cq.Region + "&realm=" + cq.Realm + "&name=" + cq.Name
+	reqUrl := c.ApiUrl + "/characters/profile?region=" + cq.Region.Slug + "&realm=" + cq.Realm + "&name=" + cq.Name
 	if cq.fields != nil && len(cq.fields) != 0 {
 		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
 	}
@@ -50,7 +49,7 @@ func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
 	var profile Character
 	err = json.Unmarshal(body, &profile)
 	if err != nil {
-		return nil, errors.New("character profile mapping error")
+		return nil, errors.New("error unmarshalling character profile")
 	}
 
 	return &profile, nil
@@ -65,7 +64,7 @@ func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
 		return nil, err
 	}
 
-	reqUrl := c.apiUrl + "/guilds/profile?region=" + gq.Region + "&realm=" + gq.Realm + "&name=" + gq.Name
+	reqUrl := c.ApiUrl + "/guilds/profile?region=" + gq.Region.Slug + "&realm=" + gq.Realm + "&name=" + gq.Name
 	if gq.fields != nil && len(gq.fields) != 0 {
 		reqUrl += "&fields=" + strings.Join(gq.fields, ",")
 	}
@@ -74,33 +73,13 @@ func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
 	if err != nil {
 		return nil, err
 	}
-	var profile Guild
-	err = json.Unmarshal(body, &profile)
+
+	profile, err := unmarshalGuild(body)
 	if err != nil {
-		return nil, errors.New("guild profile mapping error")
-	}
-	return &profile, nil
-}
-
-// getAPIResponse is a helper function that makes a GET request to the Raider.IO API
-// It returns an error if the API returns a non-200 status code, or if the
-// response body cannot be read
-func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
-	resp, err := c.httpClient.Get(reqUrl)
-
-	if resp.StatusCode != 200 {
-		return nil, errors.New(resp.Status)
+		return nil, err
 	}
 
-	if err != nil {
-		return nil, errors.New("api response error")
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.New("api response error")
-	}
-	return body, nil
+	return profile, nil
 }
 
 // GetRaids retrieves a list of raids from the Raider.IO API
@@ -108,7 +87,7 @@ func (c *Client) getAPIResponse(reqUrl string) ([]byte, error) {
 // response body cannot be read or mapped to the Raids struct
 // Takes an Expansion enum as a parameter
 func (c *Client) GetRaids(e expansion.Expansion) (*Raids, error) {
-	reqUrl := c.apiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
+	reqUrl := c.ApiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
 	body, err := c.getAPIResponse(reqUrl)
 	if err != nil {
 		return nil, err
@@ -117,7 +96,7 @@ func (c *Client) GetRaids(e expansion.Expansion) (*Raids, error) {
 	var raids Raids
 	err = json.Unmarshal(body, &raids)
 	if err != nil {
-		return nil, errors.New("raids mapping error")
+		return nil, errors.New("error unmarshalling raids")
 	}
 
 	return &raids, nil
@@ -133,8 +112,8 @@ func (c *Client) GetRaidRankings(rq *RaidQuery) (*RaidRankings, error) {
 		return nil, err
 	}
 
-	reqUrl := c.apiUrl + "/raiding/raid-rankings?raid=" + rq.Name +
-		"&difficulty=" + string(rq.Difficulty) + "&region=" + rq.Region
+	reqUrl := c.ApiUrl + "/raiding/raid-rankings?raid=" + rq.Slug +
+		"&difficulty=" + string(rq.Difficulty) + "&region=" + rq.Region.Slug
 
 	if rq.Realm != "" {
 		reqUrl += "&realm=" + rq.Realm
@@ -156,7 +135,7 @@ func (c *Client) GetRaidRankings(rq *RaidQuery) (*RaidRankings, error) {
 	var rankings RaidRankings
 	err = json.Unmarshal(body, &rankings)
 	if err != nil {
-		return nil, errors.New("raid rankings mapping error: " + err.Error())
+		return nil, errors.New("error unmarshalling raid rankings")
 	}
 
 	return &rankings, nil
