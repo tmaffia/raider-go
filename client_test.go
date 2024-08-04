@@ -1,25 +1,39 @@
 package raiderio_test
 
 import (
+	"context"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/tmaffia/raiderio"
 	"github.com/tmaffia/raiderio/expansion"
 	"github.com/tmaffia/raiderio/region"
 )
 
-func TestNewClient(t *testing.T) {
-	c := raiderio.NewClient()
+var c *raiderio.Client
+var defaultCtx context.Context
 
+func setup() {
+	c = raiderio.NewClient()
+	defaultCtx = context.Background()
+}
+
+func TestMain(m *testing.M) {
+	setup()
+	exitCode := m.Run()
+	os.Exit(exitCode)
+}
+
+func TestNewClient(t *testing.T) {
 	if c.ApiUrl != "https://raider.io/api/v1" {
 		t.Errorf("NewClient apiUrl created incorrectly")
 	}
 }
 
 func TestGetCharacterProfile(t *testing.T) {
-	c := raiderio.NewClient()
-
 	testCases := []struct {
+		timeout        bool
 		region         *region.Region
 		realm          string
 		name           string
@@ -33,10 +47,18 @@ func TestGetCharacterProfile(t *testing.T) {
 		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "invalid region"},
 		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "character not found"},
 		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
+		{timeout: true, region: region.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
-		profile, err := c.GetCharacter(&raiderio.CharacterQuery{
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(defaultCtx, time.Millisecond*10)
+			defer cancel()
+		}
+
+		profile, err := c.GetCharacter(ctx, &raiderio.CharacterQuery{
 			Region: tc.region,
 			Realm:  tc.realm,
 			Name:   tc.name,
@@ -53,9 +75,8 @@ func TestGetCharacterProfile(t *testing.T) {
 }
 
 func TestGetCharacterWGear(t *testing.T) {
-	c := raiderio.NewClient()
-
 	testCases := []struct {
+		timeout        bool
 		region         *region.Region
 		realm          string
 		name           string
@@ -63,10 +84,18 @@ func TestGetCharacterWGear(t *testing.T) {
 		expectedName   string
 	}{
 		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
+		{timeout: true, region: region.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
-		profile, err := c.GetCharacter(&raiderio.CharacterQuery{
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			defer cancel()
+		}
+
+		profile, err := c.GetCharacter(ctx, &raiderio.CharacterQuery{
 			Region: tc.region,
 			Realm:  tc.realm,
 			Name:   tc.name,
@@ -88,7 +117,6 @@ func TestGetCharacterWGear(t *testing.T) {
 }
 
 func TestGetCharacterWTalents(t *testing.T) {
-	c := raiderio.NewClient()
 	cq := raiderio.CharacterQuery{
 		Region:        region.US,
 		Realm:         "illidan",
@@ -96,16 +124,15 @@ func TestGetCharacterWTalents(t *testing.T) {
 		TalentLoadout: true,
 	}
 
-	profile, err := c.GetCharacter(&cq)
+	profile, err := c.GetCharacter(defaultCtx, &cq)
 	if err == nil && profile.TalentLoadout.LoadoutText == "" {
 		t.Fatalf("talent loadout: %v expected to not be empty", profile.TalentLoadout.LoadoutText)
 	}
 }
 
 func TestGetGuild(t *testing.T) {
-	c := raiderio.NewClient()
-
 	testCases := []struct {
+		timeout        bool
 		region         *region.Region
 		realm          string
 		name           string
@@ -119,10 +146,18 @@ func TestGetGuild(t *testing.T) {
 		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "warpath", expectedErrMsg: "invalid region"},
 		{region: region.US, realm: "illidan", name: "impossible_guild_name", expectedErrMsg: "guild not found"},
 		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
+		{timeout: true, region: region.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
-		profile, err := c.GetGuild(&raiderio.GuildQuery{
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			defer cancel()
+		}
+
+		profile, err := c.GetGuild(ctx, &raiderio.GuildQuery{
 			Region: tc.region,
 			Realm:  tc.realm,
 			Name:   tc.name,
@@ -139,7 +174,6 @@ func TestGetGuild(t *testing.T) {
 }
 
 func TestGetGuildWMembers(t *testing.T) {
-	c := raiderio.NewClient()
 	testCases := []struct {
 		region *region.Region
 		realm  string
@@ -149,12 +183,12 @@ func TestGetGuildWMembers(t *testing.T) {
 	}
 
 	for range testCases {
-		profile, err := c.GetGuild((&raiderio.GuildQuery{
+		profile, err := c.GetGuild(defaultCtx, &raiderio.GuildQuery{
 			Region:  region.US,
 			Realm:   "illidan",
 			Name:    "warpath",
 			Members: true,
-		}))
+		})
 
 		if err != nil {
 			t.Fatalf("Error getting guild")
@@ -168,7 +202,6 @@ func TestGetGuildWMembers(t *testing.T) {
 }
 
 func TestGetGuildWRaidProgression(t *testing.T) {
-	c := raiderio.NewClient()
 	testCases := []struct {
 		region *region.Region
 		realm  string
@@ -178,7 +211,7 @@ func TestGetGuildWRaidProgression(t *testing.T) {
 	}
 
 	for range testCases {
-		profile, err := c.GetGuild(&raiderio.GuildQuery{
+		profile, err := c.GetGuild(defaultCtx, &raiderio.GuildQuery{
 			Region:          region.US,
 			Realm:           "illidan",
 			Name:            "warpath",
@@ -196,42 +229,54 @@ func TestGetGuildWRaidProgression(t *testing.T) {
 }
 
 func TestGetGuildWRaidRankings(t *testing.T) {
-	c := raiderio.NewClient()
 	testCases := []struct {
-		region       *region.Region
-		realm        string
-		name         string
-		raidName     string
-		expectedRank int
+		timeout        bool
+		region         *region.Region
+		realm          string
+		name           string
+		raidName       string
+		expectedRank   int
+		expectedErrMsg string
 	}{
 		{region: region.US, realm: "illidan", name: "warpath",
 			raidName: "aberrus-the-shadowed-crucible", expectedRank: 158},
+		{timeout: true, region: region.US, realm: "illidan", name: "warpath",
+			raidName: "aberrus-the-shadowed-crucible", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
-		profile, err := c.GetGuild(&raiderio.GuildQuery{
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			defer cancel()
+		}
+
+		profile, err := c.GetGuild(ctx, &raiderio.GuildQuery{
 			Region:       region.US,
 			Realm:        "illidan",
 			Name:         "warpath",
 			RaidRankings: true,
 		})
 
-		if err != nil {
-			t.Errorf("Error getting guild")
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("error message got: %v, expected: %v",
+				err.Error(), tc.expectedErrMsg)
 		}
 
-		rank := profile.RaidRankings[tc.raidName]
-
-		if rank.Mythic.World != tc.expectedRank {
-			t.Fatalf("mythic guild ranking for raid: %v, got: %d, expected: %d",
-				rank.RaidSlug, rank.Mythic.World, tc.expectedRank)
+		if err == nil {
+			rank := profile.RaidRankings[tc.raidName]
+			if rank.Mythic.World != tc.expectedRank {
+				t.Fatalf("mythic guild ranking for raid: %v, got: %d, expected: %d",
+					rank.RaidSlug, rank.Mythic.World, tc.expectedRank)
+			}
 		}
 	}
 }
 
 func TestGetRaids(t *testing.T) {
-	c := raiderio.NewClient()
 	testCases := []struct {
+		timeout          bool
 		expansion        expansion.Expansion
 		raidName         string
 		raidDifficulty   string
@@ -239,12 +284,19 @@ func TestGetRaids(t *testing.T) {
 		expectedErrMsg   string
 	}{
 		{expansion: expansion.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedRaidName: "Aberrus, the Shadowed Crucible"},
+		{timeout: true, expansion: expansion.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedErrMsg: "raiderio api request timeout"},
 		{expansion: 2, expectedErrMsg: "unsupported expansion"},
 	}
 
 	for _, tc := range testCases {
-		raids, err := c.GetRaids(tc.expansion)
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			defer cancel()
+		}
 
+		raids, err := c.GetRaids(ctx, tc.expansion)
 		if err != nil && err.Error() != tc.expectedErrMsg {
 			t.Fatalf("expected error: %v, got %v", tc.expectedErrMsg, err.Error())
 		}
@@ -262,6 +314,7 @@ func TestGetRaids(t *testing.T) {
 func TestGetRaidRankings(t *testing.T) {
 	c := raiderio.NewClient()
 	testCases := []struct {
+		timeout                bool
 		slug                   string
 		difficulty             raiderio.RaidDifficulty
 		region                 *region.Region
@@ -284,10 +337,18 @@ func TestGetRaidRankings(t *testing.T) {
 		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, limit: -20, expectedErrMsg: "limit must be a positive int"},
 		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, expectedRank1GuildName: "Accession", limit: 40, page: 2},
 		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, limit: 40, page: -2, expectedErrMsg: "page must be a positive int"},
+		{timeout: true, slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
-		rankings, err := c.GetRaidRankings(&raiderio.RaidQuery{
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			defer cancel()
+		}
+
+		rankings, err := c.GetRaidRankings(ctx, &raiderio.RaidQuery{
 			Slug:       tc.slug,
 			Difficulty: raiderio.RaidDifficulty(tc.difficulty),
 			Region:     tc.region,
@@ -295,7 +356,6 @@ func TestGetRaidRankings(t *testing.T) {
 			Limit:      tc.limit,
 			Page:       tc.page,
 		})
-
 		if err != nil && err.Error() != tc.expectedErrMsg {
 			t.Fatalf("expected error: %v, got: %v", tc.expectedErrMsg, err.Error())
 		}

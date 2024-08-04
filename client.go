@@ -1,6 +1,7 @@
 package raiderio
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,7 +31,7 @@ func NewClient() *Client {
 // GetCharacter retrieves a character profile from the Raider.IO API
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the CharacterProfile struct
-func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
+func (c *Client) GetCharacter(ctx context.Context, cq *CharacterQuery) (*Character, error) {
 	err := validateCharacterQuery(cq)
 	if err != nil {
 		return nil, err
@@ -41,7 +42,7 @@ func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
 		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
 	}
 
-	body, err := c.getAPIResponse(reqUrl)
+	body, err := c.getAPIResponse(ctx, reqUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (c *Client) GetCharacter(cq *CharacterQuery) (*Character, error) {
 // GetGuild retrieves a guild profile from the Raider.IO API
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the GuildProfile struct
-func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
+func (c *Client) GetGuild(ctx context.Context, gq *GuildQuery) (*Guild, error) {
 	err := createGuildQuery(gq)
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
 		reqUrl += "&fields=" + strings.Join(gq.fields, ",")
 	}
 
-	body, err := c.getAPIResponse(reqUrl)
+	body, err := c.getAPIResponse(ctx, reqUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -86,9 +87,9 @@ func (c *Client) GetGuild(gq *GuildQuery) (*Guild, error) {
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the Raids struct
 // Takes an Expansion enum as a parameter
-func (c *Client) GetRaids(e expansion.Expansion) (*Raids, error) {
+func (c *Client) GetRaids(ctx context.Context, e expansion.Expansion) (*Raids, error) {
 	reqUrl := c.ApiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
-	body, err := c.getAPIResponse(reqUrl)
+	body, err := c.getAPIResponse(ctx, reqUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +107,7 @@ func (c *Client) GetRaids(e expansion.Expansion) (*Raids, error) {
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the RaidRankings struct
 // Takes a RaidQuery struct as a parameter
-func (c *Client) GetRaidRankings(rq *RaidQuery) (*RaidRankings, error) {
+func (c *Client) GetRaidRankings(ctx context.Context, rq *RaidQuery) (*RaidRankings, error) {
 	err := validateRaidRankingsQuery(rq)
 	if err != nil {
 		return nil, err
@@ -127,7 +128,7 @@ func (c *Client) GetRaidRankings(rq *RaidQuery) (*RaidRankings, error) {
 		reqUrl += "&page=" + fmt.Sprintf("%d", rq.Page)
 	}
 
-	body, err := c.getAPIResponse(reqUrl)
+	body, err := c.getAPIResponse(ctx, reqUrl)
 	if err != nil {
 		return nil, err
 	}
