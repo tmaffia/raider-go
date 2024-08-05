@@ -18,14 +18,14 @@ type CharacterQuery struct {
 // Character is a struct that represents the response from
 // a character profile request
 type Character struct {
-	Name              string `json:"name"`
-	Race              string `json:"race"`
-	Class             string `json:"class"`
-	ActiveSpec        string `json:"active_spec_name"`
-	ActiveRole        string `json:"active_spec_role"`
-	Gender            string `json:"gender"`
-	Faction           string `json:"faction"`
-	Spec              string
+	Name              string        `json:"name"`
+	Race              string        `json:"race"`
+	Class             string        `json:"class"`
+	ActiveSpec        string        `json:"active_spec_name"`
+	ActiveRole        string        `json:"active_spec_role"`
+	Gender            string        `json:"gender"`
+	Faction           string        `json:"faction"`
+	Spec              string        `json:"spec"`
 	AchievementPoints int64         `json:"achievement_points"`
 	HonorableKills    int64         `json:"honorable_kills"`
 	ThumbnailUrl      string        `json:"thumbnail_url"`
