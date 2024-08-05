@@ -10,7 +10,7 @@ Wrapper for the raider.io API written in Go
 
 ### Include module in your go.mod 
 ```
-include github.com/tmaffia/raiderio v0.3.0
+include github.com/tmaffia/raiderio v0.3.1
 ```
 
 ### Get a Character Profile

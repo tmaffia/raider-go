@@ -86,7 +86,7 @@ func (c *Client) GetGuild(ctx context.Context, gq *GuildQuery) (*Guild, error) {
 // GetRaids retrieves a list of raids from the Raider.IO API
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the Raids struct
-// Takes an Expansion enum as a parameter
+// Takes an Expansion enum as a parameter, in addition to context.Context
 func (c *Client) GetRaids(ctx context.Context, e expansion.Expansion) (*Raids, error) {
 	reqUrl := c.ApiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
 	body, err := c.getAPIResponse(ctx, reqUrl)
@@ -106,7 +106,7 @@ func (c *Client) GetRaids(ctx context.Context, e expansion.Expansion) (*Raids, e
 // GetRaidRankings retrieves a list of raid rankings from the Raider.IO API
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the RaidRankings struct
-// Takes a RaidQuery struct as a parameter
+// Takes a RaidQuery struct as a parameter, in addition to context.Context
 func (c *Client) GetRaidRankings(ctx context.Context, rq *RaidQuery) (*RaidRankings, error) {
 	err := validateRaidRankingsQuery(rq)
 	if err != nil {
@@ -140,4 +140,30 @@ func (c *Client) GetRaidRankings(ctx context.Context, rq *RaidQuery) (*RaidRanki
 	}
 
 	return &rankings, nil
+}
+
+// GetGuildBossKill returns a guild's first kill of a given boss
+// Takes a context.Context object to facilitate timeout, and a GuildBossKillQuery
+// GuildBossKillQuery has only required fields for this request
+// returns a BossKill object
+func (c *Client) GetGuildBossKill(ctx context.Context, q *GuildBossKillQuery) (*BossKill, error) {
+	err := validateGuildBossKillQuery(q)
+	if err != nil {
+		return nil, err
+	}
+	reqUrl := c.ApiUrl + "/guilds/boss-kill?raid=" + q.RaidSlug +
+		"&difficulty=" + string(q.Difficulty) + "&region=" + q.Region.Slug +
+		"&realm=" + q.Realm + "&guild=" + q.GuildName + "&boss=" + q.BossSlug
+
+	body, err := c.getAPIResponse(ctx, reqUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	k, err := unmarshalGuildBossKill(body)
+	if err != nil {
+		return nil, err
+	}
+
+	return k, nil
 }
