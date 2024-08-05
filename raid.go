@@ -1,6 +1,9 @@
 package raiderio
 
 import (
+	"encoding/json"
+	"time"
+
 	"github.com/tmaffia/raiderio/realm"
 	"github.com/tmaffia/raiderio/region"
 )
@@ -139,6 +142,153 @@ const (
 	HeroicRaid RaidDifficulty = "heroic"
 	MythicRaid RaidDifficulty = "mythic"
 )
+
+// Includes BossKillData along with the roster of characters
+// which were present for the first kill
+type BossKill struct {
+	Kill   BossKillData
+	Roster []Character
+}
+
+// BossKillData provides metadata for the guilds first boss kill
+// Includes timestamps and Item Levels etc...
+type BossKillData struct {
+	PulledAt             time.Time     `json:"pulledAt"`
+	DefeatedAt           time.Time     `json:"defeatedAt"`
+	Duration             time.Duration `json:"duration"`
+	IsSuccess            bool          `json:"isSuccess"`
+	ItemLevelEquippedAvg float32       `json:"itemLevelEquippedAvg"`
+	ItemLevelEquippedMax float32       `json:"itemLevelEquippedMax"`
+	ItemLevelEquippedMin float32       `json:"itemLevelEquippedMin"`
+}
+
+// The following two structs are unexported, for use within the package
+// to convert the ugly incoming boss-kill roster into standard "Character"
+// types. I couldnt think of a better way to covert the incoming json to
+// a standardized object, without exporting the ugly structs to the client
+// Hopefully this is fixed in json/2
+type bossKillResp struct {
+	Kill struct {
+		PulledAt             time.Time `json:"pulledAt"`
+		DefeatedAt           time.Time `json:"defeatedAt"`
+		DurationMs           int       `json:"durationMs"`
+		IsSuccess            bool      `json:"isSuccess"`
+		ItemLevelEquippedAvg float32   `json:"itemLevelEquippedAvg"`
+		ItemLevelEquippedMax float32   `json:"itemLevelEquippedMax"`
+		ItemLevelEquippedMin float32   `json:"itemLevelEquippedMin"`
+	}
+	Roster []bossKillCharacter `json:"roster"`
+}
+type bossKillCharacter struct {
+	Character struct {
+		Name  string `json:"name"`
+		Class struct {
+			Slug string `json:"slug"`
+		} `json:"class"`
+		Spec struct {
+			Slug string `json:"slug"`
+		} `json:"spec"`
+		TalentLoadout struct {
+			LoadoutSpecID int    `json:"loadoutSpecId"`
+			LoadoutText   string `json:"loadoutText"`
+		} `json:"talentLoadout"`
+		Realm struct {
+			Slug string `json:"slug"`
+		} `json:"realm"`
+		Region struct {
+			Slug string `json:"slug"`
+		} `json:"region"`
+		ItemLevelEquipped float32 `json:"itemLevelEquipped"`
+	} `json:"character"`
+}
+
+// GuildBossKillQuery requires all fields to be valid when sending
+// a request to the api. Use GetRaids() to see a list of raids and bosses
+type GuildBossKillQuery struct {
+	Region     *region.Region
+	Realm      string
+	GuildName  string
+	RaidSlug   string
+	BossSlug   string
+	Difficulty RaidDifficulty
+}
+
+// Current /guild/boss-kill api returns an enormous json
+// structure for each character in the raid roster
+// this library offers a simplified version of the data set
+func unmarshalGuildBossKill(b []byte) (*BossKill, error) {
+	resp := bossKillResp{}
+	err := json.Unmarshal(b, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	kd := BossKillData{
+		PulledAt:             resp.Kill.PulledAt,
+		DefeatedAt:           resp.Kill.DefeatedAt,
+		Duration:             time.Duration(resp.Kill.DurationMs) * time.Millisecond,
+		IsSuccess:            resp.Kill.IsSuccess,
+		ItemLevelEquippedAvg: resp.Kill.ItemLevelEquippedAvg,
+		ItemLevelEquippedMax: resp.Kill.ItemLevelEquippedMax,
+		ItemLevelEquippedMin: resp.Kill.ItemLevelEquippedMin,
+	}
+	k := BossKill{
+		Kill:   kd,
+		Roster: unmarshalBossKillRoster(&resp),
+	}
+	return &k, nil
+}
+
+func unmarshalBossKillRoster(k *bossKillResp) []Character {
+	var chars []Character
+	for _, c := range k.Roster {
+		g := Gear{
+			ItemLevelEquipped: int(c.Character.ItemLevelEquipped),
+		}
+		tl := TalentLoadout{
+			LoadoutText: c.Character.TalentLoadout.LoadoutText,
+		}
+		char := Character{
+			Name:          c.Character.Name,
+			Class:         c.Character.Class.Slug,
+			Spec:          c.Character.Spec.Slug,
+			Realm:         c.Character.Realm.Slug,
+			Region:        c.Character.Region.Slug,
+			TalentLoadout: tl,
+			Gear:          g,
+		}
+		chars = append(chars, char)
+	}
+	return chars
+}
+
+func validateGuildBossKillQuery(q *GuildBossKillQuery) error {
+	if q.Region == nil {
+		return ErrInvalidRegion
+	}
+
+	if q.Realm == "" {
+		return ErrInvalidRealm
+	}
+
+	if q.GuildName == "" {
+		return ErrInvalidGuildName
+	}
+
+	if q.RaidSlug == "" {
+		return ErrInvalidRaidName
+	}
+
+	if q.BossSlug == "" {
+		return ErrInvalidBoss
+	}
+
+	if q.Difficulty == "" || !raidDifficltyValid(q.Difficulty) {
+		return ErrInvalidRaidDiff
+	}
+
+	return nil
+}
 
 // Validates raid difficulty before sending to the api
 // making an http request to the api with an invalid difficulty

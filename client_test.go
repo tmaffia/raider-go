@@ -54,7 +54,7 @@ func TestGetCharacterProfile(t *testing.T) {
 		ctx := defaultCtx
 		var cancel context.CancelFunc
 		if tc.timeout {
-			ctx, cancel = context.WithTimeout(defaultCtx, time.Millisecond*10)
+			ctx, cancel = context.WithTimeout(defaultCtx, time.Millisecond*1)
 			defer cancel()
 		}
 
@@ -91,7 +91,7 @@ func TestGetCharacterWGear(t *testing.T) {
 		ctx := defaultCtx
 		var cancel context.CancelFunc
 		if tc.timeout {
-			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*1)
 			defer cancel()
 		}
 
@@ -153,7 +153,7 @@ func TestGetGuild(t *testing.T) {
 		ctx := defaultCtx
 		var cancel context.CancelFunc
 		if tc.timeout {
-			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*1)
 			defer cancel()
 		}
 
@@ -241,14 +241,15 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 		{region: region.US, realm: "illidan", name: "warpath",
 			raidName: "aberrus-the-shadowed-crucible", expectedRank: 158},
 		{timeout: true, region: region.US, realm: "illidan", name: "warpath",
-			raidName: "aberrus-the-shadowed-crucible", expectedErrMsg: "raiderio api request timeout"},
+			raidName:       "aberrus-the-shadowed-crucible",
+			expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
 		ctx := defaultCtx
 		var cancel context.CancelFunc
 		if tc.timeout {
-			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*1)
 			defer cancel()
 		}
 
@@ -274,12 +275,90 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 	}
 }
 
+func TestGetGuildBossKill(t *testing.T) {
+	testCases := []struct {
+		region                *region.Region
+		realm                 string
+		guildName             string
+		raidSlug              string
+		bossSlug              string
+		difficulty            raiderio.RaidDifficulty
+		expectedDefeatedAt    string
+		expectedCharacterName string
+		expectedErrMsg        string
+		timeout               bool
+	}{
+		{region: region.US, realm: "illidan", guildName: "warpath",
+			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
+			difficulty: raiderio.MythicRaid, expectedCharacterName: "Drbananaphd"},
+		{region: nil, difficulty: raiderio.MythicRaid, realm: "illidan",
+			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
+			bossSlug: "terros", expectedErrMsg: "invalid region"},
+		{region: region.US, difficulty: raiderio.MythicRaid,
+			realm: "invalid-realm", guildName: "warpath", raidSlug: "vault-of-the-incarnates",
+			bossSlug: "terros", expectedErrMsg: "invalid realm"},
+		{region: region.US, difficulty: raiderio.MythicRaid,
+			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
+			bossSlug: "terros", expectedErrMsg: "invalid realm"},
+		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+			guildName: "impossible-guild_name", raidSlug: "vault-of-the-incarnates",
+			bossSlug: "terros", expectedErrMsg: "guild not found"},
+		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
+			expectedErrMsg: "invalid guild name"},
+		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+			guildName: "warpath", raidSlug: "invalid-raid-slug", bossSlug: "terros",
+			expectedErrMsg: "invalid raid"},
+		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+			guildName: "warpath", bossSlug: "terros",
+			expectedErrMsg: "invalid raid name"},
+		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
+			bossSlug: "invalid-boss-slug", expectedErrMsg: "invalid boss"},
+		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
+			expectedErrMsg: "invalid boss"},
+		{region: region.US, realm: "illidan", guildName: "warpath",
+			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
+			expectedErrMsg: "invalid raid difficulty"},
+		{timeout: true, region: region.US, realm: "illidan", guildName: "warpath",
+			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
+			difficulty:     raiderio.MythicRaid,
+			expectedErrMsg: "raiderio api request timeout"},
+	}
+
+	for _, tc := range testCases {
+		ctx := defaultCtx
+		var cancel context.CancelFunc
+		if tc.timeout {
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*1)
+			defer cancel()
+		}
+
+		k, err := c.GetGuildBossKill(ctx, &raiderio.GuildBossKillQuery{
+			Region:     tc.region,
+			Realm:      tc.realm,
+			GuildName:  tc.guildName,
+			RaidSlug:   tc.raidSlug,
+			BossSlug:   tc.bossSlug,
+			Difficulty: tc.difficulty,
+		})
+
+		if err != nil && err.Error() != tc.expectedErrMsg {
+			t.Fatalf("error message got: %v, expected: %v", err.Error(), tc.expectedErrMsg)
+		}
+
+		if err == nil && !killIncludesCharacter(k, tc.expectedCharacterName) {
+			t.Fatalf("boss kill character name expected: %v", tc.expectedCharacterName)
+		}
+	}
+}
+
 func TestGetRaids(t *testing.T) {
 	testCases := []struct {
 		timeout          bool
 		expansion        expansion.Expansion
 		raidName         string
-		raidDifficulty   string
 		expectedRaidName string
 		expectedErrMsg   string
 	}{
@@ -292,7 +371,7 @@ func TestGetRaids(t *testing.T) {
 		ctx := defaultCtx
 		var cancel context.CancelFunc
 		if tc.timeout {
-			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*1)
 			defer cancel()
 		}
 
@@ -312,7 +391,6 @@ func TestGetRaids(t *testing.T) {
 }
 
 func TestGetRaidRankings(t *testing.T) {
-	c := raiderio.NewClient()
 	testCases := []struct {
 		timeout                bool
 		slug                   string
@@ -344,7 +422,7 @@ func TestGetRaidRankings(t *testing.T) {
 		ctx := defaultCtx
 		var cancel context.CancelFunc
 		if tc.timeout {
-			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*10)
+			ctx, cancel = context.WithTimeout(ctx, time.Millisecond*1)
 			defer cancel()
 		}
 
@@ -371,4 +449,14 @@ func TestGetRaidRankings(t *testing.T) {
 
 		}
 	}
+}
+
+// Tests if character is a part of the particular boss kill
+func killIncludesCharacter(k *raiderio.BossKill, c string) bool {
+	for _, v := range k.Roster {
+		if v.Name == c {
+			return true
+		}
+	}
+	return false
 }

@@ -19,6 +19,8 @@ var (
 	ErrUnsupportedExpac  = errors.New("unsupported expansion")
 	ErrLimitOutOfBounds  = errors.New("limit must be a positive int")
 	ErrPageOutOfBounds   = errors.New("page must be a positive int")
+	ErrInvalidBoss       = errors.New("invalid boss")
+	ErrInvalidQuery      = errors.New("invalid query")
 	ErrApiTimeout        = errors.New("raiderio api request timeout")
 	ErrUnexpected        = errors.New("unexpected error")
 )
@@ -32,6 +34,14 @@ func wrapApiError(responseBody *apiErrorResponse) error {
 
 	if strings.Contains(responseBody.Message, "Failed to find realm") {
 		return ErrInvalidRealm
+	}
+
+	if strings.Contains(responseBody.Message, "Failed to find raid") {
+		return ErrInvalidRaid
+	}
+
+	if strings.Contains(responseBody.Message, "Failed to find boss") {
+		return ErrInvalidBoss
 	}
 
 	if strings.Contains(responseBody.Message, "Could not find requested character") {
