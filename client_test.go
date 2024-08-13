@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/tmaffia/raiderio"
-	"github.com/tmaffia/raiderio/expansion"
 )
 
 var c *raiderio.Client
@@ -356,13 +355,13 @@ func TestGetGuildBossKill(t *testing.T) {
 func TestGetRaids(t *testing.T) {
 	testCases := []struct {
 		timeout          bool
-		expansion        expansion.Expansion
+		expansion        raiderio.Expansion
 		raidName         string
 		expectedRaidName string
 		expectedErrMsg   string
 	}{
-		{expansion: expansion.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedRaidName: "Aberrus, the Shadowed Crucible"},
-		{timeout: true, expansion: expansion.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedErrMsg: "raiderio api request timeout"},
+		{expansion: raiderio.Expansions.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedRaidName: "Aberrus, the Shadowed Crucible"},
+		{timeout: true, expansion: raiderio.Expansions.Dragonflight, raidName: "aberrus-the-shadowed-crucible", expectedErrMsg: "raiderio api request timeout"},
 		{expansion: 2, expectedErrMsg: "unsupported expansion"},
 	}
 

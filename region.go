@@ -1,5 +1,12 @@
 package raiderio
 
+// Region is a struct that represents a region available in Raider.IO API
+type Region struct {
+	Name      string `json:"name"`
+	Slug      string `json:"slug"`
+	ShortName string `json:"short_name"`
+}
+
 var (
 	Regions = struct {
 		WORLD *Region
@@ -41,10 +48,3 @@ var (
 		},
 	}
 )
-
-// Region is a struct that represents a region available in Raider.IO API
-type Region struct {
-	Name      string `json:"name"`
-	Slug      string `json:"slug"`
-	ShortName string `json:"short_name"`
-}
