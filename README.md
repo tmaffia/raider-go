@@ -10,7 +10,7 @@ Wrapper for the raider.io API written in Go
 
 ### Include module in your go.mod 
 ```
-include github.com/tmaffia/raiderio v0.3.1
+include github.com/tmaffia/raiderio v0.3.2
 ```
 
 ### Get a Character Profile
@@ -18,7 +18,7 @@ include github.com/tmaffia/raiderio v0.3.1
 client, err := raiderio.NewClient()
 
 profile, err := client.GetCharacter(&CharacterQuery{
-	Region: region.US,
+	Region: raiderio.Regions.US,
 	Realm:  "illidan",
 	Name:   "thehighvalue",
 	TalentLoadout: true,
@@ -30,7 +30,7 @@ fmt.Println(profile.Class) // Mage
 ### Get a Guild Profile
 ```go
 gq := raiderio.GuildQuery{
-	Region: region.US,
+	Region: raiderio.Regions.US,
 	Realm:  "illidan",
 	Name:   "warpath",
 	Members: true,
@@ -43,8 +43,8 @@ profile, err := client.GetGuild(&gq)
 ```go
 rq := raiderio.RaidQuery{
 	Name: 		"nerubar-palace",
-	Difficulty:	raiderio.MythicRaid,
-	Region: 	region.US,
+	Difficulty:	raiderio.Difficulty.MythicRaid,
+	Region: 	raiderio.Regions.US,
 	Limit: 		10,
 }
 
@@ -53,5 +53,5 @@ rankings, err := client.GetRaidRankings(&rq)
 
 ### Get Static Raid data by expansion
 ```go
-raids, err := client.GetRaids(expansion.WarWithin)
+raids, err := client.GetRaids(raiderio.Expansions.WarWithin)
 ```
