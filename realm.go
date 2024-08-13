@@ -1,4 +1,4 @@
-package realm
+package raiderio
 
 // Realm is a struct that represents a realm available in Raider.IO API
 type Realm struct {
