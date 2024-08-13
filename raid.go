@@ -134,6 +134,7 @@ type Encounter struct {
 // Options are "normal", "heroic", and "mythic"
 type RaidDifficulty string
 
+// Options for different difficulties for raid and dugneon queries
 var Difficulty = struct {
 	NormalRaid RaidDifficulty
 	HeroicRaid RaidDifficulty

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Errors that the api produces
 var (
 	ErrInvalidRegion     = errors.New("invalid region")
 	ErrInvalidRealm      = errors.New("invalid realm")
