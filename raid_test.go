@@ -3,7 +3,7 @@ package raiderio_test
 import (
 	"testing"
 
-	"github.com/tmaffia/raiderio/expansion"
+	"github.com/tmaffia/raiderio"
 )
 
 func TestGetRaidBySlug(t *testing.T) {
@@ -17,7 +17,7 @@ func TestGetRaidBySlug(t *testing.T) {
 		{slug: "aberrus-the-shadowed-crucibleinvalid raid slug", expectedErrMsg: "invalid raid"},
 	}
 
-	raids, _ := c.GetRaids(defaultCtx, expansion.Dragonflight)
+	raids, _ := c.GetRaids(defaultCtx, raiderio.Expansions.Dragonflight)
 
 	for _, tc := range testCases {
 		raid, err := raids.GetRaidBySlug(tc.slug)
