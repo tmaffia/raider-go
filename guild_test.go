@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/tmaffia/raiderio"
-	"github.com/tmaffia/raiderio/region"
 )
 
 func TestGetGuildRaidRankBySlug(t *testing.T) {
 	testCases := []struct {
-		region              *region.Region
+		region              *raiderio.Region
 		realm               string
 		name                string
 		includeRandRankings bool
@@ -17,9 +16,9 @@ func TestGetGuildRaidRankBySlug(t *testing.T) {
 		expectedRaidRank    int
 		expectedErrMsg      string
 	}{
-		{region: region.US, realm: "illidan", name: "warpath", raidSlug: "aberrus-the-shadowed-crucible", expectedRaidRank: 158, includeRandRankings: true},
-		{region: region.US, realm: "illidan", name: "warpath", raidSlug: "invalid raid slug", expectedErrMsg: "invalid raid", includeRandRankings: true},
-		{region: region.US, realm: "illidan", name: "warpath", raidSlug: "aberrus-the-shadowed-crucible",
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath", raidSlug: "aberrus-the-shadowed-crucible", expectedRaidRank: 158, includeRandRankings: true},
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath", raidSlug: "invalid raid slug", expectedErrMsg: "invalid raid", includeRandRankings: true},
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath", raidSlug: "aberrus-the-shadowed-crucible",
 			expectedErrMsg: "guild raid rankings field missing from api response", includeRandRankings: false},
 	}
 

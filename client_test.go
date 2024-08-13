@@ -8,7 +8,6 @@ import (
 
 	"github.com/tmaffia/raiderio"
 	"github.com/tmaffia/raiderio/expansion"
-	"github.com/tmaffia/raiderio/region"
 )
 
 var c *raiderio.Client
@@ -34,20 +33,20 @@ func TestNewClient(t *testing.T) {
 func TestGetCharacterProfile(t *testing.T) {
 	testCases := []struct {
 		timeout        bool
-		region         *region.Region
+		region         *raiderio.Region
 		realm          string
 		name           string
 		expectedErrMsg string
 		expectedName   string
 	}{
-		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
-		{region: region.US, realm: "", name: "highervalue", expectedErrMsg: "invalid realm"},
-		{region: region.US, realm: "illidan", name: "", expectedErrMsg: "invalid character name"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
+		{region: raiderio.Regions.US, realm: "", name: "highervalue", expectedErrMsg: "invalid realm"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "", expectedErrMsg: "invalid character name"},
 		{region: nil, realm: "illidan", name: "highervalue", expectedErrMsg: "invalid region"},
-		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "invalid region"},
-		{region: region.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "character not found"},
-		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
-		{timeout: true, region: region.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
+		{region: &raiderio.Region{Slug: "badregion"}, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "invalid region"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "impossiblecharactername", expectedErrMsg: "character not found"},
+		{region: raiderio.Regions.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
+		{timeout: true, region: raiderio.Regions.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
@@ -77,14 +76,14 @@ func TestGetCharacterProfile(t *testing.T) {
 func TestGetCharacterWGear(t *testing.T) {
 	testCases := []struct {
 		timeout        bool
-		region         *region.Region
+		region         *raiderio.Region
 		realm          string
 		name           string
 		expectedErrMsg string
 		expectedName   string
 	}{
-		{region: region.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
-		{timeout: true, region: region.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "highervalue", expectedName: "Highervalue"},
+		{timeout: true, region: raiderio.Regions.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
@@ -118,7 +117,7 @@ func TestGetCharacterWGear(t *testing.T) {
 
 func TestGetCharacterWTalents(t *testing.T) {
 	cq := raiderio.CharacterQuery{
-		Region:        region.US,
+		Region:        raiderio.Regions.US,
 		Realm:         "illidan",
 		Name:          "highervalue",
 		TalentLoadout: true,
@@ -133,20 +132,20 @@ func TestGetCharacterWTalents(t *testing.T) {
 func TestGetGuild(t *testing.T) {
 	testCases := []struct {
 		timeout        bool
-		region         *region.Region
+		region         *raiderio.Region
 		realm          string
 		name           string
 		expectedErrMsg string
 		expectedName   string
 	}{
-		{region: region.US, realm: "illidan", name: "warpath", expectedName: "Warpath"},
-		{region: region.US, realm: "", name: "warpath", expectedErrMsg: "invalid realm"},
-		{region: region.US, realm: "illidan", name: "", expectedErrMsg: "invalid guild name"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath", expectedName: "Warpath"},
+		{region: raiderio.Regions.US, realm: "", name: "warpath", expectedErrMsg: "invalid realm"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "", expectedErrMsg: "invalid guild name"},
 		{region: nil, realm: "illidan", name: "highervalue", expectedErrMsg: "invalid region"},
-		{region: &region.Region{Slug: "badregion"}, realm: "illidan", name: "warpath", expectedErrMsg: "invalid region"},
-		{region: region.US, realm: "illidan", name: "impossible_guild_name", expectedErrMsg: "guild not found"},
-		{region: region.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
-		{timeout: true, region: region.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
+		{region: &raiderio.Region{Slug: "badregion"}, realm: "illidan", name: "warpath", expectedErrMsg: "invalid region"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "impossible_guild_name", expectedErrMsg: "guild not found"},
+		{region: raiderio.Regions.US, realm: "invalidrealm", name: "highervalue", expectedErrMsg: "invalid realm"},
+		{timeout: true, region: raiderio.Regions.US, realm: "illidan", name: "highervalue", expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {
@@ -175,16 +174,16 @@ func TestGetGuild(t *testing.T) {
 
 func TestGetGuildWMembers(t *testing.T) {
 	testCases := []struct {
-		region *region.Region
+		region *raiderio.Region
 		realm  string
 		name   string
 	}{
-		{region: region.US, realm: "illidan", name: "warpath"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath"},
 	}
 
 	for range testCases {
 		profile, err := c.GetGuild(defaultCtx, &raiderio.GuildQuery{
-			Region:  region.US,
+			Region:  raiderio.Regions.US,
 			Realm:   "illidan",
 			Name:    "warpath",
 			Members: true,
@@ -203,16 +202,16 @@ func TestGetGuildWMembers(t *testing.T) {
 
 func TestGetGuildWRaidProgression(t *testing.T) {
 	testCases := []struct {
-		region *region.Region
+		region *raiderio.Region
 		realm  string
 		name   string
 	}{
-		{region: region.US, realm: "illidan", name: "warpath"},
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath"},
 	}
 
 	for range testCases {
 		profile, err := c.GetGuild(defaultCtx, &raiderio.GuildQuery{
-			Region:          region.US,
+			Region:          raiderio.Regions.US,
 			Realm:           "illidan",
 			Name:            "warpath",
 			RaidProgression: true,
@@ -231,16 +230,16 @@ func TestGetGuildWRaidProgression(t *testing.T) {
 func TestGetGuildWRaidRankings(t *testing.T) {
 	testCases := []struct {
 		timeout        bool
-		region         *region.Region
+		region         *raiderio.Region
 		realm          string
 		name           string
 		raidName       string
 		expectedRank   int
 		expectedErrMsg string
 	}{
-		{region: region.US, realm: "illidan", name: "warpath",
+		{region: raiderio.Regions.US, realm: "illidan", name: "warpath",
 			raidName: "aberrus-the-shadowed-crucible", expectedRank: 158},
-		{timeout: true, region: region.US, realm: "illidan", name: "warpath",
+		{timeout: true, region: raiderio.Regions.US, realm: "illidan", name: "warpath",
 			raidName:       "aberrus-the-shadowed-crucible",
 			expectedErrMsg: "raiderio api request timeout"},
 	}
@@ -254,7 +253,7 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 		}
 
 		profile, err := c.GetGuild(ctx, &raiderio.GuildQuery{
-			Region:       region.US,
+			Region:       raiderio.Regions.US,
 			Realm:        "illidan",
 			Name:         "warpath",
 			RaidRankings: true,
@@ -277,7 +276,7 @@ func TestGetGuildWRaidRankings(t *testing.T) {
 
 func TestGetGuildBossKill(t *testing.T) {
 	testCases := []struct {
-		region                *region.Region
+		region                *raiderio.Region
 		realm                 string
 		guildName             string
 		raidSlug              string
@@ -288,40 +287,40 @@ func TestGetGuildBossKill(t *testing.T) {
 		expectedErrMsg        string
 		timeout               bool
 	}{
-		{region: region.US, realm: "illidan", guildName: "warpath",
+		{region: raiderio.Regions.US, realm: "illidan", guildName: "warpath",
 			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
 			difficulty: raiderio.MythicRaid, expectedCharacterName: "Drbananaphd"},
 		{region: nil, difficulty: raiderio.MythicRaid, realm: "illidan",
 			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
 			bossSlug: "terros", expectedErrMsg: "invalid region"},
-		{region: region.US, difficulty: raiderio.MythicRaid,
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid,
 			realm: "invalid-realm", guildName: "warpath", raidSlug: "vault-of-the-incarnates",
 			bossSlug: "terros", expectedErrMsg: "invalid realm"},
-		{region: region.US, difficulty: raiderio.MythicRaid,
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid,
 			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
 			bossSlug: "terros", expectedErrMsg: "invalid realm"},
-		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid, realm: "illidan",
 			guildName: "impossible-guild_name", raidSlug: "vault-of-the-incarnates",
 			bossSlug: "terros", expectedErrMsg: "guild not found"},
-		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid, realm: "illidan",
 			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
 			expectedErrMsg: "invalid guild name"},
-		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid, realm: "illidan",
 			guildName: "warpath", raidSlug: "invalid-raid-slug", bossSlug: "terros",
 			expectedErrMsg: "invalid raid"},
-		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid, realm: "illidan",
 			guildName: "warpath", bossSlug: "terros",
 			expectedErrMsg: "invalid raid name"},
-		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid, realm: "illidan",
 			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
 			bossSlug: "invalid-boss-slug", expectedErrMsg: "invalid boss"},
-		{region: region.US, difficulty: raiderio.MythicRaid, realm: "illidan",
+		{region: raiderio.Regions.US, difficulty: raiderio.MythicRaid, realm: "illidan",
 			guildName: "warpath", raidSlug: "vault-of-the-incarnates",
 			expectedErrMsg: "invalid boss"},
-		{region: region.US, realm: "illidan", guildName: "warpath",
+		{region: raiderio.Regions.US, realm: "illidan", guildName: "warpath",
 			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
 			expectedErrMsg: "invalid raid difficulty"},
-		{timeout: true, region: region.US, realm: "illidan", guildName: "warpath",
+		{timeout: true, region: raiderio.Regions.US, realm: "illidan", guildName: "warpath",
 			raidSlug: "vault-of-the-incarnates", bossSlug: "terros",
 			difficulty:     raiderio.MythicRaid,
 			expectedErrMsg: "raiderio api request timeout"},
@@ -395,27 +394,27 @@ func TestGetRaidRankings(t *testing.T) {
 		timeout                bool
 		slug                   string
 		difficulty             raiderio.RaidDifficulty
-		region                 *region.Region
+		region                 *raiderio.Region
 		realm                  string
 		limit                  int
 		page                   int
 		expectedErrMsg         string
 		expectedRank1GuildName string
 	}{
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, expectedRank1GuildName: "Liquid"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, realm: "proudmoore", expectedRank1GuildName: "The Royal Knights"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: "mythic", region: region.EU, expectedRank1GuildName: "Echo"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, realm: "illidan", expectedRank1GuildName: "Liquid"},
-		{slug: "invalid raid slug", difficulty: raiderio.MythicRaid, region: region.US, realm: "illidan", expectedErrMsg: "invalid raid"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.WORLD, expectedRank1GuildName: "Liquid"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, realm: "proudmoore", expectedRank1GuildName: "The Royal Knights"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "mythic", region: raiderio.Regions.EU, expectedRank1GuildName: "Echo"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, realm: "illidan", expectedRank1GuildName: "Liquid"},
+		{slug: "invalid raid slug", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, realm: "illidan", expectedErrMsg: "invalid raid"},
 		{slug: "aberrus-the-shadowed-crucible", difficulty: "mythic", region: nil, realm: "illidan", expectedErrMsg: "invalid region"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: "", region: region.US, realm: "illidan", expectedErrMsg: "invalid raid difficulty"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: "invalid-difficulty", region: region.US, realm: "illidan", expectedErrMsg: "invalid raid difficulty"},
-		{slug: "", difficulty: raiderio.MythicRaid, region: region.US, realm: "illidan", expectedErrMsg: "invalid raid name"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, expectedRank1GuildName: "Liquid", limit: 20},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.WORLD, limit: -20, expectedErrMsg: "limit must be a positive int"},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, expectedRank1GuildName: "Accession", limit: 40, page: 2},
-		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, limit: 40, page: -2, expectedErrMsg: "page must be a positive int"},
-		{timeout: true, slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: region.US, expectedErrMsg: "raiderio api request timeout"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "", region: raiderio.Regions.US, realm: "illidan", expectedErrMsg: "invalid raid difficulty"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: "invalid-difficulty", region: raiderio.Regions.US, realm: "illidan", expectedErrMsg: "invalid raid difficulty"},
+		{slug: "", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, realm: "illidan", expectedErrMsg: "invalid raid name"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.WORLD, expectedRank1GuildName: "Liquid", limit: 20},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.WORLD, limit: -20, expectedErrMsg: "limit must be a positive int"},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, expectedRank1GuildName: "Accession", limit: 40, page: 2},
+		{slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, limit: 40, page: -2, expectedErrMsg: "page must be a positive int"},
+		{timeout: true, slug: "aberrus-the-shadowed-crucible", difficulty: raiderio.MythicRaid, region: raiderio.Regions.US, expectedErrMsg: "raiderio api request timeout"},
 	}
 
 	for _, tc := range testCases {

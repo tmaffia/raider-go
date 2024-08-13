@@ -3,15 +3,13 @@ package raiderio
 import (
 	"encoding/json"
 	"errors"
-
-	"github.com/tmaffia/raiderio/region"
 )
 
 // GuildQuery is a struct that represents the query parameters
 // sent for a guild profile request
 // Supports optional request fields: members, raid_progression, raid_rankings
 type GuildQuery struct {
-	Region          *region.Region
+	Region          *Region
 	Realm           string
 	Name            string
 	Members         bool
