@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/tmaffia/raiderio/expansions"
 )
 
 // Base URL for the Raider.IO API
@@ -36,7 +38,7 @@ func (c *Client) GetCharacter(ctx context.Context, cq *CharacterQuery) (*Charact
 	}
 
 	reqUrl := c.ApiUrl + "/characters/profile?region=" + cq.Region.Slug + "&realm=" + cq.Realm + "&name=" + cq.Name
-	if cq.fields != nil && len(cq.fields) != 0 {
+	if len(cq.fields) != 0 {
 		reqUrl += "&fields=" + strings.Join(cq.fields, ",")
 	}
 
@@ -64,7 +66,7 @@ func (c *Client) GetGuild(ctx context.Context, gq *GuildQuery) (*Guild, error) {
 	}
 
 	reqUrl := c.ApiUrl + "/guilds/profile?region=" + gq.Region.Slug + "&realm=" + gq.Realm + "&name=" + gq.Name
-	if gq.fields != nil && len(gq.fields) != 0 {
+	if len(gq.fields) != 0 {
 		reqUrl += "&fields=" + strings.Join(gq.fields, ",")
 	}
 
@@ -85,7 +87,7 @@ func (c *Client) GetGuild(ctx context.Context, gq *GuildQuery) (*Guild, error) {
 // It returns an error if the API returns a non-200 status code, or if the
 // response body cannot be read or mapped to the Raids struct
 // Takes an Expansion enum as a parameter, in addition to context.Context
-func (c *Client) GetRaids(ctx context.Context, e Expansion) (*Raids, error) {
+func (c *Client) GetRaids(ctx context.Context, e expansions.Expansion) (*Raids, error) {
 	reqUrl := c.ApiUrl + "/raiding/static-data?expansion_id=" + fmt.Sprintf("%d", e)
 	body, err := c.getAPIResponse(ctx, reqUrl)
 	if err != nil {

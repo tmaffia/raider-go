@@ -1,4 +1,4 @@
-package raiderio
+package regions
 
 // Region is a struct that represents a region available in Raider.IO API
 type Region struct {
@@ -8,42 +8,35 @@ type Region struct {
 }
 
 // List of regions which can be used in queries in the library
-var Regions = struct {
-	WORLD *Region
-	US    *Region
-	EU    *Region
-	KR    *Region
-	TW    *Region
-	CN    *Region
-}{
-	WORLD: &Region{
+var (
+	WORLD = &Region{
 		Name:      "World",
 		Slug:      "world",
 		ShortName: "world",
-	},
-	US: &Region{
+	}
+	US = &Region{
 		Name:      "US",
 		Slug:      "us",
 		ShortName: "us",
-	},
-	EU: &Region{
+	}
+	EU = &Region{
 		Name:      "EU",
 		Slug:      "eu",
 		ShortName: "eu",
-	},
-	KR: &Region{
+	}
+	KR = &Region{
 		Name:      "KR",
 		Slug:      "kr",
 		ShortName: "kr",
-	},
-	TW: &Region{
+	}
+	TW = &Region{
 		Name:      "TW",
 		Slug:      "tw",
 		ShortName: "tw",
-	},
-	CN: &Region{
+	}
+	CN = &Region{
 		Name:      "CN",
 		Slug:      "cn",
 		ShortName: "cn",
-	},
-}
+	}
+)

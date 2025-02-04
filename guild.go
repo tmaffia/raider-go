@@ -3,13 +3,15 @@ package raiderio
 import (
 	"encoding/json"
 	"errors"
+
+	"github.com/tmaffia/raiderio/regions"
 )
 
 // GuildQuery is a struct that represents the query parameters
 // sent for a guild profile request
 // Supports optional request fields: members, raid_progression, raid_rankings
 type GuildQuery struct {
-	Region          *Region
+	Region          *regions.Region
 	Realm           string
 	Name            string
 	Members         bool
@@ -46,6 +48,8 @@ type GuildRaidProgression struct {
 	Amirdrassil          RaidProgression `json:"amirdrassil-amirdrassil-the-dreams-hope"`
 	Aberrus              RaidProgression `json:"aberrus-the-shadowed-crucible"`
 	VaultOfTheIncarnates RaidProgression `json:"vault-of-the-incarnates"`
+	NerubarPalace        RaidProgression `json:"nerubar-palace"`
+	Undermine            RaidProgression `json:"liberation-of-undermine"`
 }
 
 // createGuildQuery creates and validates a GuildQuery struct

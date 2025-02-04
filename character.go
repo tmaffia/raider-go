@@ -1,9 +1,13 @@
 package raiderio
 
+import (
+	"github.com/tmaffia/raiderio/regions"
+)
+
 // CharacterQuery is a struct that represents the query parameters
 // sent for a character profile request
 type CharacterQuery struct {
-	Region        *Region
+	Region        *regions.Region
 	Realm         string
 	Name          string
 	TalentLoadout bool

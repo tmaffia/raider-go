@@ -3,6 +3,9 @@ package raiderio
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/tmaffia/raiderio/realms"
+	"github.com/tmaffia/raiderio/regions"
 )
 
 // RaidQuery is a struct that represents the query parameters
@@ -11,7 +14,7 @@ import (
 type RaidQuery struct {
 	Slug       string
 	Difficulty RaidDifficulty
-	Region     *Region
+	Region     *regions.Region
 	Realm      string
 	Limit      int
 	Page       int
@@ -31,14 +34,14 @@ type RaidRanking struct {
 	Rank         int `json:"rank"`
 	RegionalRank int `json:"region_rank"`
 	Guild        struct {
-		Id      int    `json:"id"`
-		Name    string `json:"name"`
-		Faction string `json:"faction"`
-		Realm   Realm  `json:"realm"`
-		Region  Region `json:"region"`
-		Path    string `json:"path"`
-		Logo    string `json:"logo"`
-		Color   string `json:"color"`
+		Id      int            `json:"id"`
+		Name    string         `json:"name"`
+		Faction string         `json:"faction"`
+		Realm   realms.Realm   `json:"realm"`
+		Region  regions.Region `json:"region"`
+		Path    string         `json:"path"`
+		Logo    string         `json:"logo"`
+		Color   string         `json:"color"`
 	} `json:"guild"`
 	EncountersDefeated []struct {
 		Slug           string `json:"slug"`
@@ -207,7 +210,7 @@ type bossKillCharacter struct {
 // GuildBossKillQuery requires all fields to be valid when sending
 // a request to the api. Use GetRaids() to see a list of raids and bosses
 type GuildBossKillQuery struct {
-	Region     *Region
+	Region     *regions.Region
 	Realm      string
 	GuildName  string
 	RaidSlug   string
