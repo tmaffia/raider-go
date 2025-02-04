@@ -18,7 +18,7 @@ include github.com/tmaffia/raiderio v0.3.3
 client, err := raiderio.NewClient()
 
 profile, err := client.GetCharacter(&CharacterQuery{
-	Region: raiderio.Regions.US,
+	Region: regions.US,
 	Realm:  "illidan",
 	Name:   "thehighvalue",
 	TalentLoadout: true,
@@ -30,7 +30,7 @@ fmt.Println(profile.Class) // Mage
 ### Get a Guild Profile
 ```go
 gq := raiderio.GuildQuery{
-	Region: raiderio.Regions.US,
+	Region: regions.US,
 	Realm:  "illidan",
 	Name:   "warpath",
 	Members: true,
@@ -43,8 +43,8 @@ profile, err := client.GetGuild(&gq)
 ```go
 rq := raiderio.RaidQuery{
 	Name: 		"nerubar-palace",
-	Difficulty:	raiderio.Difficulty.MythicRaid,
-	Region: 	raiderio.Regions.US,
+	Difficulty:	raiderio.MYTHIC_RAID,
+	Region: 	regions.US,
 	Limit: 		10,
 }
 
@@ -53,5 +53,5 @@ rankings, err := client.GetRaidRankings(&rq)
 
 ### Get Static Raid data by expansion
 ```go
-raids, err := client.GetRaids(raiderio.Expansions.WarWithin)
+raids, err := client.GetRaids(expansions.WAR_WITHIN)
 ```

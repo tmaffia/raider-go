@@ -138,15 +138,12 @@ type Encounter struct {
 type RaidDifficulty string
 
 // Options for different difficulties for raid and dugneon queries
-var Difficulty = struct {
-	NormalRaid RaidDifficulty
-	HeroicRaid RaidDifficulty
-	MythicRaid RaidDifficulty
-}{
-	NormalRaid: "normal",
-	HeroicRaid: "heroic",
-	MythicRaid: "mythic",
-}
+
+const (
+	NORMAL_RAID RaidDifficulty = "normal"
+	HEROIC_RAID RaidDifficulty = "heroic"
+	MYTHIC_RAID RaidDifficulty = "mythic"
+)
 
 // Includes BossKillData along with the roster of characters
 // which were present for the first kill
@@ -301,7 +298,7 @@ func validateGuildBossKillQuery(q *GuildBossKillQuery) error {
 // we add the error by checking for valid difficulty before sending
 // the request to the api
 func raidDifficltyValid(d RaidDifficulty) bool {
-	if d == Difficulty.NormalRaid || d == Difficulty.HeroicRaid || d == Difficulty.MythicRaid {
+	if d == NORMAL_RAID || d == HEROIC_RAID || d == MYTHIC_RAID {
 		return true
 	}
 

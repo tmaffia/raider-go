@@ -17,7 +17,7 @@ func TestGetRaidBySlug(t *testing.T) {
 		{slug: "aberrus-the-shadowed-crucibleinvalid raid slug", expectedErrMsg: "invalid raid"},
 	}
 
-	raids, _ := c.GetRaids(defaultCtx, expansions.Dragonflight)
+	raids, _ := c.GetRaids(defaultCtx, expansions.DRAGONFLIGHT)
 
 	for _, tc := range testCases {
 		raid, err := raids.GetRaidBySlug(tc.slug)
